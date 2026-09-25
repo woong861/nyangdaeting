@@ -91,6 +91,8 @@ textarea{width:100%;min-height:52px;padding:8px 10px;font-size:12px;border:1px s
     <input type="text" id="apiUrl" value="https://script.google.com/macros/s/AKfycby3y0A00gmuDX3DMJlW4qTYeL90ecwjr1BATbf4GgAZYUlZ8qcJBITmJohRraMDa80a/exec">
     <label>사이트 주소</label>
     <input type="text" id="baseUrl" value="https://woong861.github.io/hanyangting" style="max-width:280px">
+    <label>운영진 키</label>
+    <input type="password" id="adminKey" style="max-width:200px" placeholder="처음 한 번만 입력" autocomplete="off">
     <button class="btn b-sec" onclick="loadApplicants()">🔄 신청자 새로고침</button>
   </div>
 
@@ -188,7 +190,10 @@ async function loadApplicants() {
   const list = document.getElementById('list');
   list.innerHTML = '<div class="empty">⏳ 불러오는 중… (처음엔 30초까지 걸려요)</div>';
   try {
-    const d = await apiFetch(url + '?action=hyList&t=' + Date.now(), {
+    const key = document.getElementById('adminKey').value.trim();
+    if (!key) throw new Error('운영진 키를 입력하세요');
+    try { localStorage.setItem('hy_admin_key', key); } catch (e) { }
+    const d = await apiFetch(url + '?action=hyList&key=' + encodeURIComponent(key) + '&t=' + Date.now(), {
       onRetry: (n, t) => { list.innerHTML = '<div class="empty">⏳ 재시도 ' + n + '/' + t + '</div>'; }
     });
     if (d.error) throw new Error(d.error);
@@ -376,6 +381,7 @@ function siteBase() {
   if (location.protocol.startsWith('http')) return new URL('.', location.href).href.replace(/\/+$/, '');
   return (document.getElementById('baseUrl').value || '').trim().replace(/\/+$/, '');
 }
+try { document.getElementById('adminKey').value = localStorage.getItem('hy_admin_key') || ''; } catch (e) { }
 window.addEventListener('DOMContentLoaded', () => { if (location.protocol.startsWith('http')) document.getElementById('baseUrl').value = siteBase(); });
 function smsText(name, url) {
   return '[한양팅] ' + name + '님, 매칭 결과가 도착했어요 🦁💙\n\n아래 링크에서 상대 프로필과 연락처를 확인하세요:\n' + url +
@@ -405,6 +411,7 @@ async function sendSms() {
       method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         type: 'hyMatch',
+        key: document.getElementById('adminKey').value.trim(),
         a: { name: slotA.name, phone: slotA.phone, url: document.getElementById('urlA').value, row: slotA.row },
         b: { name: slotB.name, phone: slotB.phone, url: document.getElementById('urlB').value, row: slotB.row }
       })
