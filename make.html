@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>한냥팅 운영진 — 매칭</title>
+<title>냥대팅 운영진 — 매칭</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E%F0%9F%9B%A0%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -76,7 +76,7 @@ textarea{width:100%;min-height:52px;padding:8px 10px;font-size:12px;border:1px s
 <body>
 <div class="container">
   <div class="header">
-    <h1>🦁 한냥팅 운영진 — 매칭</h1>
+    <h1>🦁 냥대팅 운영진 — 매칭</h1>
     <div class="meta"><span id="loadedCount">0명</span> · <span id="lastRefresh">로딩 안 함</span></div>
   </div>
 
@@ -90,7 +90,7 @@ textarea{width:100%;min-height:52px;padding:8px 10px;font-size:12px;border:1px s
     <label>Apps Script URL</label>
     <input type="text" id="apiUrl" value="https://script.google.com/macros/s/AKfycby3y0A00gmuDX3DMJlW4qTYeL90ecwjr1BATbf4GgAZYUlZ8qcJBITmJohRraMDa80a/exec">
     <label>사이트 주소</label>
-    <input type="text" id="baseUrl" value="https://woong861.github.io/hannyangting" style="max-width:280px">
+    <input type="text" id="baseUrl" value="https://woong861.github.io/nyangdaeting" style="max-width:280px">
     <label>운영진 키</label>
     <input type="password" id="adminKey" style="max-width:200px" placeholder="처음 한 번만 입력" autocomplete="off">
     <button class="btn b-sec" onclick="loadApplicants()">🔄 신청자 새로고침</button>
@@ -384,8 +384,8 @@ function siteBase() {
 try { document.getElementById('adminKey').value = localStorage.getItem('hy_admin_key') || ''; } catch (e) { }
 window.addEventListener('DOMContentLoaded', () => { if (location.protocol.startsWith('http')) document.getElementById('baseUrl').value = siteBase(); });
 function smsText(name, url) {
-  return '[한냥팅] ' + name + '님, 매칭 결과가 도착했어요 🦁💙\n\n아래 링크에서 상대 프로필과 연락처를 확인하세요:\n' + url +
-    '\n\n먼저 인사 건네보는 것도 좋아요 :)\n\n※ 본 번호는 발송 전용입니다 (응대 불가)\n문의는 한냥팅 오픈채팅으로 부탁드려요';
+  return '[냥대팅] ' + name + '님, 매칭 결과가 도착했어요 🦁💙\n\n아래 링크에서 상대 프로필과 연락처를 확인하세요:\n' + url +
+    '\n\n먼저 인사 건네보는 것도 좋아요 :)\n\n※ 본 번호는 발송 전용입니다 (응대 불가)\n문의는 냥대팅 오픈채팅으로 부탁드려요';
 }
 function hideRes() { document.getElementById('res').classList.add('hidden'); document.getElementById('sendStatus').textContent = ''; }
 function generate() {
@@ -417,7 +417,7 @@ async function sendSms() {
       })
     });
     st.className = 'status ok';
-    st.textContent = '✓ 발송 요청 완료 — 실제 결과는 운영 시트 "한냥팅_매칭_로그" 탭에서 확인 (실패한 사람은 매칭완료로 안 바뀌어요)';
+    st.textContent = '✓ 발송 요청 완료 — 실제 결과는 운영 시트 "냥대팅_매칭_로그" 탭에서 확인 (실패한 사람은 매칭완료로 안 바뀌어요)';
     setTimeout(() => { clearAll(); document.getElementById('comment').value = ''; btn.textContent = '📱 양쪽에 문자 발송'; btn.disabled = false; loadApplicants(); }, 3000);
   } catch (e) {
     btn.disabled = false; btn.textContent = '📱 양쪽에 문자 발송';
