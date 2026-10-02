@@ -218,7 +218,7 @@ function renderList() {
     if (F.gender !== 'all' && a.gender !== F.gender) return false;
     if (F.event !== 'all' && (a.eventType || '').indexOf(F.event) === -1) return false;
     if (F.hide && isMatched(a)) return false;
-    if (q && ![a.name, a.school, a.major, a.mbti, a.instagram, a.kakao, a.intro].join(' ').toLowerCase().includes(q)) return false;
+    if (q && ![a.name, a.school, a.major, a.mbti, a.instagram, a.kakao, a.intro, a.friends].join(' ').toLowerCase().includes(q)) return false;
     return true;
   });
   document.getElementById('filteredCount').textContent = rows.length + ' / ' + APPLICANTS.length + '명';
@@ -235,6 +235,7 @@ function renderList() {
       '<div class="nm">' + esc(a.name) + g + st + '</div>' +
       '<div class="sub">' + esc(sub) + '</div><div class="sub">' + esc(contact) + '</div>' +
       '<div class="sub">💸 ' + esc(a.payment || '-') + '</div>' + avoid +
+      (a.friends ? '<div class="sub" style="color:#1b64b5">👯 ' + esc(a.friends.replace(/^\[미팅 친구\]\s*/, '')) + '</div>' : '') +
       (a.intro ? '<div class="intro">"' + esc(a.intro) + '"</div>' : '') +
       (a.ideal ? '<div class="sub">💘 ' + esc(a.ideal) + '</div>' : '') +
       '</div><div class="btns"><button class="btn b-sec" onclick="setSlot(\'a\',' + a.row + ')">A로</button><button class="btn b-sec" onclick="setSlot(\'b\',' + a.row + ')">B로</button></div></div>';
@@ -346,7 +347,8 @@ function renderSlots() {
     el.querySelector('.sc').innerHTML = '<div class="nm">' + esc(s.name) + ' <span class="meta">' + esc(s.gender) + '</span></div>' +
       '<div class="sub">' + esc([s.school, s.major, s.age + '살', s.mbti, evKind(s)].join(' · ')) + '</div>' +
       '<div class="sub">📞 ' + esc(s.phone || '(없음)') + ' · 카톡 ' + esc(s.kakao || '-') + ' · @' + esc(s.instagram || '-') + '</div>' +
-      (s.avoid ? '<div class="avoid">피하고 싶은: ' + esc(s.avoid) + '</div>' : '');
+      (s.avoid ? '<div class="avoid">피하고 싶은: ' + esc(s.avoid) + '</div>' : '') +
+      (s.friends ? '<div class="sub" style="color:#1b64b5">👯 ' + esc(s.friends.replace(/^\[미팅 친구\]\s*/, '')) + '</div>' : '');
   });
   document.getElementById('genBtn').disabled = !(slotA && slotB);
   // 조건 점검

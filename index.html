@@ -204,6 +204,16 @@ textarea{resize:vertical;min-height:76px}
 .submit:disabled{opacity:.6}
 .form-note{text-align:center;font-size:13px;color:var(--muted);margin-top:12px}
 
+/* friends */
+.friends{margin-top:4px}
+.fr{border:1.5px dashed var(--sky-2);border-radius:18px;padding:16px 14px 4px;margin-bottom:12px;background:#fbfdff}
+.fr-hd{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:var(--blue);margin-bottom:12px}
+.fr-hd span{width:24px;height:24px;border-radius:8px;background:var(--sky);display:grid;place-items:center;font-size:12px}
+.fr .fx{margin-bottom:12px}
+.fr .fx label{display:block;font-size:13px;font-weight:700;margin-bottom:5px;color:var(--sub)}
+.fr .fx label i{font-style:normal;color:var(--pink)}
+.fr input.miss{border-color:var(--err);background:#fff}
+
 /* done */
 .done{display:none;text-align:center}
 .done.on{display:block;animation:pop .45s cubic-bezier(.2,1.3,.4,1)}
@@ -411,8 +421,15 @@ footer b{color:rgba(255,255,255,.85)}
                 <input type="radio" name="event_type" id="ev2" value="미팅 (2대2) (타학교친구와 신청가능)"><label for="ev2">미팅<small>2:2</small></label>
                 <input type="radio" name="event_type" id="ev3" value="미팅 (3대3) (타학교친구와 신청가능)"><label for="ev3">미팅<small>3:3</small></label>
               </div>
-              <p class="hint" id="meetHint" hidden>미팅은 함께할 친구와 같이 신청해요 (타학교 친구 OK). 친구 정보는 오픈채팅으로 알려주세요.</p>
+              <p class="hint" id="meetHint" hidden>미팅은 함께할 친구와 같이 신청해요 (타학교 친구 OK). 아래에 같이 나갈 친구 정보를 적어주세요.</p>
               <p class="err">만남 유형을 골라주세요</p>
+            </div>
+            <div class="field friends" data-f="friends" id="friendsBox" hidden>
+              <label class="l">같이 나갈 친구 <i>*</i></label>
+              <div id="friendList"></div>
+              <input type="hidden" id="friends" name="friends">
+              <p class="hint">신청하는 본인 정보는 아래 ②에 적고, 여기엔 친구 정보만 적어주세요.</p>
+              <p class="err">친구 이름·나이·학교를 모두 적어주세요</p>
             </div>
             <div class="field" data-f="match_scope">
               <label class="l">매칭 상대 <i>*</i></label>
@@ -591,6 +608,7 @@ const SHOW_COUNT_FROM = 15;           // 신청자 수가 이 이상일 때만 �
 // ===== 기존 "한양팅" 구글폼(이름만 예전 것) (응답이 이 폼에 그대로 쌓임) =====
 const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdkMEmV1-FRqJVHDB0m19d6Q-K9FJCXCkYDXq7sCcwG5a2DUg/formResponse';
 const FIELD_IDS = {
+  friends: 'entry.1956755891',   // 폼 맨 위 선택 질문(예전 시즌 안내 칸)을 친구 정보 칸으로 사용
   name: 'entry.676956056',
   event_type: 'entry.1274287348',
   school: 'entry.1524565808',
@@ -724,6 +742,61 @@ function saveDraft() {
   updatePay();
 })();
 
+// ===== 미팅 친구 정보 =====
+const FR_FIELDS = [['n', '이름', '예: 김민지', true], ['a', '나이', '예: 22', true], ['s', '학교', '예: 한양대', true], ['k', '카톡 ID', '선택', false], ['m', '학과 / 학년', '선택 · 예: 경영 / 2학년', false]];
+function friendCount() {
+  const ev = val('event_type');
+  return ev.includes('3대3') ? 2 : ev.includes('2대2') ? 1 : 0;
+}
+function renderFriends() {
+  const n = friendCount(), box = $('#friendsBox'), list = $('#friendList');
+  box.hidden = n === 0;
+  const keep = [...list.querySelectorAll('.fr')].map(fr => {
+    const o = {}; fr.querySelectorAll('input').forEach(i => { o[i.dataset.k] = i.value; }); return o;
+  });
+  if (list.children.length === n) return;
+  list.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const prev = keep[i] || {};
+    const fr = document.createElement('div');
+    fr.className = 'fr';
+    fr.innerHTML = '<div class="fr-hd"><span>' + (i + 1) + '</span>친구 ' + (i + 1) + '</div><div class="row2"></div>';
+    const grid = fr.querySelector('.row2');
+    FR_FIELDS.forEach(([k, label, ph, req]) => {
+      const w = document.createElement('div');
+      w.className = 'fx';
+      if (k === 'm') w.style.gridColumn = '1 / -1';
+      w.innerHTML = '<label>' + label + (req ? ' <i>*</i>' : '') + '</label><input type="' + (k === 'a' ? 'number' : 'text') + '" data-k="' + k + '" placeholder="' + ph + '"' + (k === 'a' ? ' inputmode="numeric"' : '') + '>';
+      w.querySelector('input').value = prev[k] || '';
+      grid.appendChild(w);
+    });
+    list.appendChild(fr);
+  }
+  syncFriends();
+}
+function syncFriends() {
+  const parts = [...$('#friendList').querySelectorAll('.fr')].map((fr, i) => {
+    const g = k => (fr.querySelector('[data-k="' + k + '"]').value || '').trim();
+    const bits = [g('n'), g('a') && g('a') + '살', g('s'), g('m'), g('k') && '카톡 ' + g('k')].filter(Boolean);
+    return bits.length ? '친구' + (i + 1) + ': ' + bits.join(' / ') : '';
+  }).filter(Boolean);
+  $('#friends').value = parts.length ? '[미팅 친구] ' + parts.join(' | ') : '';
+}
+function friendsMissing() {
+  let miss = false;
+  $('#friendList').querySelectorAll('.fr').forEach(fr => {
+    FR_FIELDS.forEach(([k, , , req]) => {
+      const inp = fr.querySelector('[data-k="' + k + '"]');
+      const bad = req && !inp.value.trim();
+      inp.classList.toggle('miss', bad);
+      if (bad) miss = true;
+    });
+  });
+  return miss;
+}
+$('#friendList').addEventListener('input', e => { e.target.classList.remove('miss'); syncFriends(); });
+renderFriends();
+
 form.addEventListener('input', e => {
   if (e.target.name === 'mbti') e.target.value = e.target.value.toUpperCase();
   if (e.target.name === 'phone') e.target.value = e.target.value.replace(/[^0-9-]/g, '');
@@ -731,7 +804,7 @@ form.addEventListener('input', e => {
   updatePay();
   saveDraft();
 });
-form.addEventListener('change', () => { updatePay(); saveDraft(); });
+form.addEventListener('change', () => { renderFriends(); updatePay(); saveDraft(); });
 
 // 검증
 const REQUIRED = ['event_type', 'match_scope', 'gender', 'name', 'age', 'school', 'major', 'avoid', 'mbti', 'ideal', 'phone', 'kakao', 'instagram', 'refund'];
@@ -744,6 +817,7 @@ function validate() {
   if (val('age') && (!age || age < 17 || age > 45)) bad('age');
   const phone = val('phone').replace(/[^0-9]/g, '');
   if (val('phone') && !/^01[016789][0-9]{7,8}$/.test(phone)) bad('phone');
+  if (friendCount() && friendsMissing()) bad('friends');
   if (!$('#agree').checked || !$('#agree2').checked) bad('agree');
   if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
   return !first;
