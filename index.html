@@ -429,7 +429,7 @@ footer b{color:rgba(255,255,255,.85)}
               <div id="friendList"></div>
               <input type="hidden" id="friends" name="friends">
               <p class="hint">신청하는 본인 정보는 아래 ②에 적고, 여기엔 친구 정보만 적어주세요.</p>
-              <p class="err">친구 이름·나이·학교를 모두 적어주세요</p>
+              <p class="err">친구 이름·나이·학교·카톡·인스타를 모두 적어주세요 (인스타 없으면 '없음')</p>
             </div>
             <div class="field" data-f="match_scope">
               <label class="l">매칭 상대 <i>*</i></label>
@@ -743,7 +743,7 @@ function saveDraft() {
 })();
 
 // ===== 미팅 친구 정보 =====
-const FR_FIELDS = [['n', '이름', '예: 김민지', true], ['a', '나이', '예: 22', true], ['s', '학교', '예: 한양대', true], ['k', '카톡 ID', '선택', false], ['m', '학과 / 학년', '선택 · 예: 경영 / 2학년', false]];
+const FR_FIELDS = [['n', '이름', '예: 김민지', true], ['a', '나이', '예: 22', true], ['s', '학교', '예: 한양대', true], ['m', '학과 / 학년', '선택', false], ['k', '카톡 ID', '친구 카톡 ID', true], ['i', '인스타 ID', "없으면 '없음'", true]];
 function friendCount() {
   const ev = val('event_type');
   return ev.includes('3대3') ? 2 : ev.includes('2대2') ? 1 : 0;
@@ -765,7 +765,6 @@ function renderFriends() {
     FR_FIELDS.forEach(([k, label, ph, req]) => {
       const w = document.createElement('div');
       w.className = 'fx';
-      if (k === 'm') w.style.gridColumn = '1 / -1';
       w.innerHTML = '<label>' + label + (req ? ' <i>*</i>' : '') + '</label><input type="' + (k === 'a' ? 'number' : 'text') + '" data-k="' + k + '" placeholder="' + ph + '"' + (k === 'a' ? ' inputmode="numeric"' : '') + '>';
       w.querySelector('input').value = prev[k] || '';
       grid.appendChild(w);
@@ -777,7 +776,8 @@ function renderFriends() {
 function syncFriends() {
   const parts = [...$('#friendList').querySelectorAll('.fr')].map((fr, i) => {
     const g = k => (fr.querySelector('[data-k="' + k + '"]').value || '').trim();
-    const bits = [g('n'), g('a') && g('a') + '살', g('s'), g('m'), g('k') && '카톡 ' + g('k')].filter(Boolean);
+    const ig = g('i').replace(/^@/, '');
+    const bits = [g('n'), g('a') && g('a') + '살', g('s'), g('m'), g('k') && '카톡 ' + g('k'), ig && '인스타 ' + ig].filter(Boolean);
     return bits.length ? '친구' + (i + 1) + ': ' + bits.join(' / ') : '';
   }).filter(Boolean);
   $('#friends').value = parts.length ? '[미팅 친구] ' + parts.join(' | ') : '';
