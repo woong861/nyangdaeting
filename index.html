@@ -429,7 +429,7 @@ footer b{color:rgba(255,255,255,.85)}
               <div id="friendList"></div>
               <input type="hidden" id="friends" name="friends">
               <p class="hint">신청하는 본인 정보는 아래 ②에 적고, 여기엔 친구 정보만 적어주세요.</p>
-              <p class="err">친구 이름·나이·학교·카톡·인스타를 모두 적어주세요 (인스타 없으면 '없음')</p>
+              <p class="err">친구 이름·나이·학교·카톡·인스타를 모두 적어주세요</p>
             </div>
             <div class="field" data-f="match_scope">
               <label class="l">매칭 상대 <i>*</i></label>
@@ -514,8 +514,8 @@ footer b{color:rgba(255,255,255,.85)}
               </div>
               <div class="field" data-f="instagram">
                 <label class="l" for="instagram">인스타 ID <i>*</i></label>
-                <input type="text" id="instagram" name="instagram" maxlength="30" autocapitalize="off" placeholder="없으면 '없음'">
-                <p class="err">없으면 '없음'</p>
+                <input type="text" id="instagram" name="instagram" maxlength="30" autocapitalize="off" placeholder="예: nyang_dae">
+                <p class="err">인스타 ID를 적어주세요</p>
               </div>
             </div>
           </fieldset>
@@ -743,7 +743,7 @@ function saveDraft() {
 })();
 
 // ===== 미팅 친구 정보 =====
-const FR_FIELDS = [['n', '이름', '예: 김민지', true], ['a', '나이', '예: 22', true], ['s', '학교', '예: 한양대', true], ['m', '학과 / 학년', '선택', false], ['k', '카톡 ID', '친구 카톡 ID', true], ['i', '인스타 ID', "없으면 '없음'", true]];
+const FR_FIELDS = [['n', '이름', '예: 김민지', true], ['a', '나이', '예: 22', true], ['s', '학교', '예: 한양대', true], ['m', '학과 / 학년', '선택', false], ['k', '카톡 ID', '친구 카톡 ID', true], ['i', '인스타 ID', '친구 인스타 ID', true]];
 function friendCount() {
   const ev = val('event_type');
   return ev.includes('3대3') ? 2 : ev.includes('2대2') ? 1 : 0;
@@ -782,12 +782,14 @@ function syncFriends() {
   }).filter(Boolean);
   $('#friends').value = parts.length ? '[미팅 친구] ' + parts.join(' | ') : '';
 }
+const NO_IG = /^@?(없음|없어요|없습니다|안해요|안함|x|X|-|\.|no|none|n\/a)$/i;
+function igBad(v) { v = (v || '').trim(); return !v || NO_IG.test(v); }
 function friendsMissing() {
   let miss = false;
   $('#friendList').querySelectorAll('.fr').forEach(fr => {
     FR_FIELDS.forEach(([k, , , req]) => {
       const inp = fr.querySelector('[data-k="' + k + '"]');
-      const bad = req && !inp.value.trim();
+      const bad = req && (k === 'i' ? igBad(inp.value) : !inp.value.trim());
       inp.classList.toggle('miss', bad);
       if (bad) miss = true;
     });
@@ -818,6 +820,7 @@ function validate() {
   const phone = val('phone').replace(/[^0-9]/g, '');
   if (val('phone') && !/^01[016789][0-9]{7,8}$/.test(phone)) bad('phone');
   if (friendCount() && friendsMissing()) bad('friends');
+  if (val('instagram') && igBad(val('instagram'))) bad('instagram');
   if (!$('#agree').checked || !$('#agree2').checked) bad('agree');
   if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
   return !first;
