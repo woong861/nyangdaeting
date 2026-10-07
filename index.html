@@ -440,7 +440,7 @@ footer b{color:rgba(255,255,255,.85)}
               <div id="friendList"></div>
               <input type="hidden" id="friends" name="friends">
               <p class="hint">신청하는 본인 정보는 아래 ②에 적고, 여기엔 친구 정보만 적어주세요.</p>
-              <p class="err">친구 이름·나이·학교·카톡·인스타를 모두 적어주세요</p>
+              <p class="err">친구 이름·나이·학교·카톡·인스타를 정확히 적어주세요</p>
             </div>
             <div class="field" data-f="match_scope">
               <label class="l">매칭 상대 <i>*</i></label>
@@ -466,12 +466,12 @@ footer b{color:rgba(255,255,255,.85)}
               <div class="field" data-f="name">
                 <label class="l" for="name">이름 <i>*</i></label>
                 <input type="text" id="name" name="name" autocomplete="name" maxlength="20">
-                <p class="err">이름을 적어주세요</p>
+                <p class="err">실명을 적어주세요 (한글 2~5자)</p>
               </div>
               <div class="field" data-f="age">
                 <label class="l" for="age">나이 <i>*</i></label>
                 <input type="number" id="age" name="age" inputmode="numeric" min="18" max="40" placeholder="예: 22">
-                <p class="err">나이를 숫자로</p>
+                <p class="err">나이를 숫자로 (18~39)</p>
               </div>
             </div>
             <div class="field" data-f="school">
@@ -480,12 +480,12 @@ footer b{color:rgba(255,255,255,.85)}
               <div class="quick" data-target="school">
                 <button type="button">한양대</button><button type="button">한양여대</button><button type="button">고려대</button><button type="button">경희대</button><button type="button">외대</button><button type="button">이화여대</button><button type="button">숙명여대</button><button type="button">동덕여대</button><button type="button">건국대</button><button type="button">세종대</button>
               </div>
-              <p class="err">학교를 적어주세요</p>
+              <p class="err">학교 이름을 정확히 적어주세요</p>
             </div>
             <div class="field" data-f="major">
               <label class="l" for="major">학과 / 학년 <i>*</i></label>
               <input type="text" id="major" name="major" placeholder="예: 경영학부 / 3학년" maxlength="40">
-              <p class="err">학과와 학년을 적어주세요</p>
+              <p class="err">학과와 학년을 정확히 적어주세요</p>
             </div>
             <div class="field" data-f="avoid">
               <label class="l" for="avoid">피하고 싶은 학과 / 학년 <i>*</i></label>
@@ -496,7 +496,7 @@ footer b{color:rgba(255,255,255,.85)}
             <div class="field" data-f="mbti">
               <label class="l" for="mbti">MBTI <i>*</i></label>
               <input type="text" id="mbti" name="mbti" placeholder="예: ENFP (모르면 '모름')" maxlength="10" autocapitalize="characters">
-              <p class="err">MBTI를 적어주세요</p>
+              <p class="err">MBTI 4글자 (예: ENFP) 또는 '모름'</p>
             </div>
             <div class="field" data-f="intro">
               <label class="l" for="intro">한 줄 자기소개 <small style="color:var(--muted);font-weight:500">(선택)</small></label>
@@ -505,7 +505,7 @@ footer b{color:rgba(255,255,255,.85)}
             <div class="field" data-f="ideal">
               <label class="l" for="ideal">이상형 한 줄 <i>*</i></label>
               <textarea id="ideal" name="ideal" maxlength="100" placeholder="예: 웃음 많고 연락 잘 되는 사람"></textarea>
-              <p class="err">이상형을 한 줄 적어주세요</p>
+              <p class="err">이상형을 한 줄 제대로 적어주세요</p>
             </div>
           </fieldset>
 
@@ -521,12 +521,12 @@ footer b{color:rgba(255,255,255,.85)}
               <div class="field" data-f="kakao">
                 <label class="l" for="kakao">카카오톡 ID <i>*</i></label>
                 <input type="text" id="kakao" name="kakao" maxlength="30" autocapitalize="off">
-                <p class="err">카톡 ID를 적어주세요</p>
+                <p class="err">카톡 ID를 정확히 적어주세요 (영문·숫자)</p>
               </div>
               <div class="field" data-f="instagram">
                 <label class="l" for="instagram">인스타 ID <i>*</i></label>
                 <input type="text" id="instagram" name="instagram" maxlength="30" autocapitalize="off" placeholder="예: nyang_dae">
-                <p class="err">인스타 ID를 적어주세요</p>
+                <p class="err">인스타 ID를 정확히 적어주세요 (영문·숫자·._)</p>
               </div>
             </div>
           </fieldset>
@@ -722,7 +722,7 @@ function updatePay() {
     if (refund.dataset.auto) { refund.value = ''; delete refund.dataset.auto; }
   }
   // 입금은 신청 후 안내 → 폼의 입금정보 칸에는 금액/상태를 자동 기록
-  $('#payment').value = p === 0 ? '무료 (여학우 소개팅)' : '입금 전 · 계좌 추후 안내 · ' + p.toLocaleString('ko-KR') + '원' + (isMeet ? '/1인' : '');
+  $('#payment').value = p === 0 ? '무료 (여학우 소개팅)' : '입금 전 · ' + p.toLocaleString('ko-KR') + '원' + (isMeet ? '/1인' : '');
 }
 $('#refund').addEventListener('input', e => { delete e.target.dataset.auto; });
 
@@ -805,7 +805,13 @@ function friendsMissing() {
   $('#friendList').querySelectorAll('.fr').forEach(fr => {
     FR_FIELDS.forEach(([k, , , req]) => {
       const inp = fr.querySelector('[data-k="' + k + '"]');
-      const bad = req && (k === 'i' ? igBad(inp.value) : !inp.value.trim());
+      const v = inp.value.trim();
+      let bad = req && !v;
+      if (v && k === 'n') bad = !isName(v);
+      if (v && k === 'a') bad = !(Number(v) >= 18 && Number(v) <= 39);
+      if (v && k === 's') bad = !hasWord(v);
+      if (v && k === 'k') bad = !isKakao(v);
+      if (k === 'i') bad = !isInsta(v);
       inp.classList.toggle('miss', bad);
       if (bad) miss = true;
     });
@@ -824,6 +830,30 @@ form.addEventListener('input', e => {
 });
 form.addEventListener('change', () => { renderFriends(); updatePay(); saveDraft(); });
 
+// ===== 장난 신청 거르기 =====
+// ① 명백한 엉터리 → 제출 불가 (칸 오류)
+const JAMO_ONLY = /^[ㄱ-ㅎㅏ-ㅣ\s.,!?~^ㅡ-]+$/;
+const isName = v => /^[가-힣]{2,5}$/.test(v) || /^[A-Za-z][A-Za-z ]{1,29}$/.test(v);
+const isKakao = v => /^[A-Za-z0-9._-]{2,30}$/.test(v);
+const isInsta = v => /^@?[A-Za-z0-9._]{1,30}$/.test(v) && !igBad(v);
+const isMbti = v => /^[EIei][NSns][TFtf][JPjp]$/.test(v) || v === '모름';
+const hasWord = v => /[가-힣A-Za-z]{2,}/.test(v) && !JAMO_ONLY.test(v);
+// ② 애매하게 장난 같은 신청 → 제출은 되지만 계좌 대신 '운영진 확인 후 안내'
+const FAKE_NAMES = ['홍길동', '김철수', '이영희', '아무개', '고길동', '둘리', '테스트', '임꺽정', '김아무개'];
+const MASH = /(asdf|qwer|zxcv|ㅁㄴㅇㄹ|ㅂㅈㄷㄱ|ㅋㅋ|ㅎㅎ|ㅠㅠ|시발|씨발|ㅅㅂ|병신|ㅂㅅ|존나|fuck|shit|test|테스트|장난|아무거나|몰라용|ㅗ)/i;
+function suspicionReasons() {
+  const r = [];
+  const texts = ['name', 'school', 'major', 'ideal', 'intro', 'avoid'].map(k => val(k));
+  if (FAKE_NAMES.includes(val('name'))) r.push('가짜 이름');
+  if (texts.some(t => /(.)\1{3,}/.test(t))) r.push('같은 글자 반복');
+  if (['name', 'school', 'major', 'ideal', 'intro'].some(k => MASH.test(val(k)))) r.push('장난·욕설 단어');
+  const ph = val('phone').replace(/[^0-9]/g, '');
+  if (/(\d)\1{6,}/.test(ph) || /12345678|23456789|87654321/.test(ph)) r.push('의심 전화번호');
+  if (val('ideal').length < 3) r.push('이상형 너무 짧음');
+  if (val('name') && val('name') === val('school')) r.push('이름=학교');
+  return r;
+}
+
 // 검증
 const REQUIRED = ['event_type', 'match_scope', 'gender', 'name', 'age', 'school', 'major', 'avoid', 'mbti', 'ideal', 'phone', 'kakao', 'instagram', 'refund'];
 function validate() {
@@ -832,11 +862,18 @@ function validate() {
   form.querySelectorAll('.field.bad').forEach(f => f.classList.remove('bad'));
   REQUIRED.forEach(k => { if (!val(k)) bad(k); });
   const age = Number(val('age'));
-  if (val('age') && (!age || age < 17 || age > 45)) bad('age');
+  if (val('age') && (!age || age < 18 || age > 39)) bad('age');
+  if (val('name') && !isName(val('name'))) bad('name');
+  if (val('school') && !hasWord(val('school'))) bad('school');
+  if (val('major') && !hasWord(val('major'))) bad('major');
+  if (val('ideal') && JAMO_ONLY.test(val('ideal'))) bad('ideal');
+  if (val('avoid') && JAMO_ONLY.test(val('avoid'))) bad('avoid');
+  if (val('mbti') && !isMbti(val('mbti'))) bad('mbti');
+  if (val('kakao') && !isKakao(val('kakao'))) bad('kakao');
   const phone = val('phone').replace(/[^0-9]/g, '');
   if (val('phone') && !/^01[016789][0-9]{7,8}$/.test(phone)) bad('phone');
   if (friendCount() && friendsMissing()) bad('friends');
-  if (val('instagram') && igBad(val('instagram'))) bad('instagram');
+  if (val('instagram') && !isInsta(val('instagram'))) bad('instagram');
   if (!$('#agree').checked || !$('#agree2').checked) bad('agree');
   if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
   return !first;
@@ -848,16 +885,18 @@ form.addEventListener('submit', async e => {
   if (!validate()) return;
   const btn = $('#submitBtn');
   btn.disabled = true; btn.textContent = '제출 중...';
+  const sus = suspicionReasons();
   const body = new URLSearchParams();
   Object.keys(FIELD_IDS).forEach(k => {
     let v = val(k);
+    if (k === 'payment' && sus.length) v = '⚠️검토필요(' + sus.join(',') + ') · ' + v;
     if (k === 'phone') v = v.replace(/[^0-9]/g, '');
     if (k === 'instagram') v = v.replace(/^@/, '');
     if (v) body.append(FIELD_IDS[k], v);
   });
   try {
     await fetch(GOOGLE_FORM_URL, { method: 'POST', mode: 'no-cors', body: body });
-    showDone(val('gender'), val('event_type'), val('phone'));
+    showDone(val('gender'), val('event_type'), val('phone'), sus.length > 0);
     try { localStorage.removeItem(DRAFT_KEY); } catch (e2) { }
   } catch (err) {
     btn.disabled = false; btn.textContent = '💙 신청서 제출하기';
@@ -891,7 +930,7 @@ async function loadPayAccount() {
   btn.hidden = true;
 }
 
-function showDone(g, ev, phone) {
+function showDone(g, ev, phone, suspicious) {
   $('#formArea').style.display = 'none';
   const p = priceOf(ev, g);
   if (p === 0) $('#doneMoney').innerHTML = '참가비 <b>무료</b> — 입금 없이 사진만 보내면 돼요';
@@ -901,7 +940,12 @@ function showDone(g, ev, phone) {
     $('#pbAmount').textContent = amt;
     $('#pbName').textContent = val('name') || '신청자 이름';
     $('#payBox').hidden = false;
-    loadPayAccount();
+    if (suspicious) {
+      // 장난 의심 신청서엔 계좌를 띄우지 않음
+      $('#pbAcct').textContent = '운영진 확인 후 오픈채팅에서 안내해드려요';
+      $('#pbCopy').hidden = true;
+      $('#doneMoney').innerHTML = '오픈채팅에서 <b>입금 계좌 안내</b> 받기 (신청 내용 확인 후 안내)';
+    } else loadPayAccount();
   }
   $('#donePhone').textContent = phone;
   $('#doneArea').classList.add('on');
