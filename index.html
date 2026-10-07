@@ -227,6 +227,16 @@ textarea{resize:vertical;min-height:76px}
 .warnbox{background:var(--pink-soft);color:#c22c5f;border-radius:14px;padding:13px 15px;font-size:13.5px;font-weight:700;margin-top:12px}
 .done .btn{width:100%}
 
+.paybox{text-align:left;background:linear-gradient(135deg,#f1f6fd,#fdf3f7);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:20px}
+.pb-top{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--sub);font-weight:600}
+.pb-top b{font-size:24px;font-weight:850;color:var(--navy);letter-spacing:-.03em}
+.pb-acct{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border-radius:12px;padding:12px 14px;margin-top:12px}
+.pb-acct small{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.pb-acct b{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.pb-copy{border:0;background:var(--navy);color:#fff;border-radius:10px;padding:9px 14px;font-size:13.5px;font-weight:750;white-space:nowrap}
+.pb-note{font-size:13px;color:var(--sub);margin-top:10px}
+.pb-note b{color:var(--ink)}
+
 /* faq */
 .faq details{background:var(--card);border:1px solid var(--line);border-radius:18px;margin-bottom:10px;padding:0 20px;transition:box-shadow .2s}
 .faq details[open]{box-shadow:var(--shadow)}
@@ -378,7 +388,7 @@ footer b{color:rgba(255,255,255,.85)}
         </div>
         <ol class="steps">
           <li class="rv"><strong>신청서 작성</strong><span>아래 신청서를 1분이면 채울 수 있어요.</span></li>
-          <li class="rv"><strong>오픈채팅으로 사진 제출 · 입금 안내</strong><span>잘 나온 본인 사진 1~2장을 보내주세요. 참가비가 있는 분은 입금 계좌를 오픈채팅에서 안내해드려요.</span></li>
+          <li class="rv"><strong>입금 + 오픈채팅으로 사진 제출</strong><span>잘 나온 본인 사진 1~2장을 보내주세요. 참가비가 있는 분은 신청 완료 화면에 나오는 계좌로 입금하고 캡처를 같이 보내주세요.</span></li>
           <li class="rv"><strong>운영진이 직접 매칭</strong><span>MBTI·이상형·피하고 싶은 학과까지 보고 짝을 찾아요.</span></li>
           <li class="rv"><strong>문자로 결과 도착</strong><span>링크를 열면 상대 프로필과 카톡·인스타가 나와요. 먼저 인사해보세요 👋</span></li>
         </ol>
@@ -526,7 +536,7 @@ footer b{color:rgba(255,255,255,.85)}
             <div class="pay">
               <div id="payLabel">유형과 성별을 고르면 금액이 나와요</div>
               <div class="amount" id="payAmount">—</div>
-              <div class="acct" id="acctBox">입금 계좌는 신청 후 <b>오픈채팅에서 안내</b>해드려요. 지금 입금하지 않아도 돼요.</div>
+              <div class="acct" id="acctBox">입금 계좌는 <b>신청서 제출 후 완료 화면</b>에서 알려드려요.</div>
             </div>
             <input type="hidden" id="payment" name="payment">
             <div class="field" data-f="refund">
@@ -552,8 +562,13 @@ footer b{color:rgba(255,255,255,.85)}
         <div class="big">🦁</div>
         <h2>신청서 접수 완료!</h2>
         <p style="color:var(--muted);font-size:15px;margin-top:6px">마지막 한 단계만 남았어요.</p>
+        <div class="paybox" id="payBox" hidden>
+          <div class="pb-top"><span>참가비</span><b id="pbAmount"></b></div>
+          <div class="pb-acct"><div><small>입금 계좌</small><b id="pbAcct">불러오는 중…</b></div><button type="button" class="pb-copy" id="pbCopy">복사</button></div>
+          <p class="pb-note">입금자명은 <b id="pbName">신청자 이름</b>으로 보내주세요.</p>
+        </div>
         <ul class="checklist">
-          <li id="doneMoney">오픈채팅에서 입금 계좌 안내받고 입금하기</li>
+          <li id="doneMoney">참가비 입금하기</li>
           <li>오픈채팅으로 <b>잘 나온 본인 사진 1~2장</b> 보내기 (매칭용)</li>
         </ul>
         <a class="btn btn-primary" href="https://open.kakao.com/o/sy7hqPQi" target="_blank" rel="noopener">📩 오픈채팅으로 사진 보내기</a>
@@ -850,11 +865,44 @@ form.addEventListener('submit', async e => {
   }
 });
 
+// 입금 계좌는 신청 완료 후에만 서버에서 받아옴 (페이지 소스에 계좌번호 없음)
+async function loadPayAccount() {
+  const el = $('#pbAcct'), btn = $('#pbCopy');
+  for (let i = 0; i < 3; i++) {
+    try {
+      const r = await fetch(API_URL + '?action=hyPay&t=' + Date.now(), { cache: 'no-store' });
+      const a = await r.json();
+      if (a && a.number) {
+        el.innerHTML = '';
+        [a.bank, a.number, a.holder].forEach((t, i) => {
+          const sp = document.createElement('span');
+          sp.style.whiteSpace = 'nowrap';
+          sp.textContent = t + (i < 2 ? ' ' : '');
+          el.appendChild(sp);
+        });
+        btn.hidden = false;
+        btn.onclick = () => copyText(a.bank + ' ' + a.number, '계좌번호를 복사했어요');
+        return;
+      }
+    } catch (e) { }
+    await new Promise(r => setTimeout(r, 1500));
+  }
+  el.textContent = '오픈채팅에 문의해주세요';
+  btn.hidden = true;
+}
+
 function showDone(g, ev, phone) {
   $('#formArea').style.display = 'none';
   const p = priceOf(ev, g);
   if (p === 0) $('#doneMoney').innerHTML = '참가비 <b>무료</b> — 입금 없이 사진만 보내면 돼요';
-  else $('#doneMoney').innerHTML = '참가비 <b>' + (ev.startsWith('미팅') ? '1인 ' : '') + p.toLocaleString('ko-KR') + '원</b> — 입금 계좌는 오픈채팅에서 안내받아요';
+  else {
+    const amt = (ev.startsWith('미팅') ? '1인 ' : '') + p.toLocaleString('ko-KR') + '원';
+    $('#doneMoney').innerHTML = '위 계좌로 참가비 <b>' + amt + '</b> 입금하고, <b>입금 캡처</b>도 오픈채팅으로 보내기';
+    $('#pbAmount').textContent = amt;
+    $('#pbName').textContent = val('name') || '신청자 이름';
+    $('#payBox').hidden = false;
+    loadPayAccount();
+  }
   $('#donePhone').textContent = phone;
   $('#doneArea').classList.add('on');
   $('#apply').scrollIntoView({ behavior: 'smooth' });
