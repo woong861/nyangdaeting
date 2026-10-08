@@ -366,6 +366,10 @@ function renderSlots() {
 }
 
 // ============ 링크 · 문자 ============
+// 링크 인코딩: 숫자+a~f만 사용 (하이픈·밑줄이 있으면 일부 문자앱이 링크를 중간에서 끊어 결과 페이지가 오류남)
+function hexEnc(obj) {
+  return Array.from(new TextEncoder().encode(JSON.stringify(obj)), b => b.toString(16).padStart(2, '0')).join('');
+}
 function b64url(obj) {
   const bytes = new TextEncoder().encode(JSON.stringify(obj)); let bin = '';
   bytes.forEach(b => bin += String.fromCharCode(b));
@@ -374,7 +378,7 @@ function b64url(obj) {
 function payload(p) {
   const c = document.getElementById('comment').value.trim();
   const o = { s: normSchool(p.school) || p.school, a: p.age, i: p.instagram, k: p.kakao, m: p.mbti, b: p.intro, g: p.major ? majorName(p.major) : '' };
-  if (/^(없음|x|X|-)$/.test(o.i || '')) delete o.i;
+  if (/^@?(없음|없어요|없습니다|안해요|안함|비활성화|x|X|-|\.|no|none)$/i.test(o.i || '')) delete o.i;
   if (c) o.c = c;
   Object.keys(o).forEach(k => { if (!o[k]) delete o[k]; });
   return o;
@@ -392,8 +396,8 @@ function smsText(name, url) {
 function hideRes() { document.getElementById('res').classList.add('hidden'); document.getElementById('sendStatus').textContent = ''; }
 function generate() {
   if (!slotA || !slotB) return;
-  const base = siteBase() + '/match.html?p=';
-  const ua = base + b64url(payload(slotB)), ub = base + b64url(payload(slotA));
+  const base = siteBase() + '/match.html?q=';
+  const ua = base + hexEnc(payload(slotB)), ub = base + hexEnc(payload(slotA));
   document.getElementById('urlA').value = ua; document.getElementById('urlB').value = ub;
   document.getElementById('smsPreview').textContent = '🌸 ' + slotA.name + ' (' + (slotA.phone || '전화없음') + ')\n\n' + smsText(slotA.name, ua) +
     '\n\n────────────\n\n💙 ' + slotB.name + ' (' + (slotB.phone || '전화없음') + ')\n\n' + smsText(slotB.name, ub);

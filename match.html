@@ -109,8 +109,18 @@ function decode(str) {
     return JSON.parse(new TextDecoder().decode(bytes));
   } catch (e) { return null; }
 }
-const p = new URLSearchParams(location.search).get('p');
-const d = p ? decode(p) : null;
+// q = 16진수(새 방식, 문자앱에서 안 끊김), p = base64url(예전 링크 호환)
+function decodeHex(h) {
+  try {
+    h = String(h).toLowerCase().replace(/[^0-9a-f]/g, '');
+    const bytes = new Uint8Array(h.length / 2);
+    for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(h.substr(i * 2, 2), 16);
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch (e) { return null; }
+}
+const qs = new URLSearchParams(location.search);
+const q = qs.get('q'), p = qs.get('p');
+const d = q ? decodeHex(q) : p ? decode(p) : null;
 const $ = id => document.getElementById(id);
 if (!d || !(d.s || d.a || d.k || d.i)) {
   $('env').style.display = 'none';
