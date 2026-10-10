@@ -121,7 +121,15 @@ textarea{width:100%;min-height:52px;padding:8px 10px;font-size:12px;border:1px s
           제외: 같은학교만 선택인데 학교 다름 · 피하고 싶은 학과/학년에 걸림 · 같은 과(같은과 X 적은 경우) · 나이 차 5살 초과<br>
           점수: 나이 차 · MBTI 궁합 · 이상형에 상대 MBTI/학교 언급 · 먼저 신청한 사람 우선
         </div>
+        <label style="display:flex;gap:7px;align-items:center;margin-top:10px;font-size:12.5px;font-weight:700;cursor:pointer">
+          <input type="checkbox" id="onlyReady" checked onchange="suggest()"> 확인된 사람만 — 남: <span style="color:#1f9d63">입금완료</span> · 여: <span style="color:#d6336c">매칭</span>
+          <span class="meta" style="font-weight:500">(냥대팅(응답) 시트 C열 기준)</span>
+        </label>
         <div class="sugg" id="sugg"></div>
+        <div id="bulkBox" style="display:none;margin-top:12px;border-top:1px dashed var(--line);padding-top:12px">
+          <button class="btn b-ok" id="bulkBtn" onclick="sendAllSugg()">📱 추천 페어 전체 발송</button>
+          <div class="status" id="bulkStatus"></div>
+        </div>
       </div>
 
       <div class="panel">
@@ -209,6 +217,11 @@ async function loadApplicants() {
   }
 }
 
+// 냥대팅(응답) 시트 C열 표시: 남자는 '입금완료', 여자는 '매칭'이 있어야 추천 대상
+function isReady(a) {
+  const m = a.mark || '';
+  return a.gender === '남자' ? /입금완료/.test(m) : a.gender === '여자' ? /매칭/.test(m) : false;
+}
 function isMatched(a) { return /매칭|완료|done/i.test(a.status || ''); }
 function evKind(a) { const e = a.eventType || ''; return e.includes('3대3') ? '3:3' : e.includes('2대2') ? '2:2' : e.includes('소개팅') ? '소개팅' : e; }
 
@@ -234,7 +247,7 @@ function renderList() {
     return '<div class="' + cls + '"><div class="idx">#' + a.row + '</div><div>' +
       '<div class="nm">' + esc(a.name) + g + st + '</div>' +
       '<div class="sub">' + esc(sub) + '</div><div class="sub">' + esc(contact) + '</div>' +
-      '<div class="sub">💸 ' + esc(a.payment || '-') + '</div>' + avoid +
+      '<div class="sub">💸 ' + esc(a.payment || '-') + (a.mark ? ' <span class="st" style="background:' + (isReady(a) ? '#e3f6ea;color:#1f9d63' : '#f1f3f6;color:#667389') + '">' + esc(a.mark) + '</span>' : '') + '</div>' + avoid +
       (a.friends ? '<div class="sub" style="color:#1b64b5">👯 ' + esc(a.friends.replace(/^\[미팅 친구\]\s*/, '')) + '</div>' : '') +
       (a.intro ? '<div class="intro">"' + esc(a.intro) + '"</div>' : '') +
       (a.ideal ? '<div class="sub">💘 ' + esc(a.ideal) + '</div>' : '') +
@@ -301,7 +314,8 @@ function pairEval(m, f) {
 }
 let SUGG = [];
 function suggest() {
-  const pool = APPLICANTS.filter(a => !isMatched(a) && evKind(a) === '소개팅');
+  const onlyReady = document.getElementById('onlyReady').checked;
+  const pool = APPLICANTS.filter(a => !isMatched(a) && evKind(a) === '소개팅' && (!onlyReady || isReady(a)));
   const men = pool.filter(a => a.gender === '남자'), women = pool.filter(a => a.gender === '여자');
   const order = a => new Date(a.ts).getTime() || a.row;
   const pairs = [];
@@ -318,7 +332,47 @@ function suggest() {
   el.innerHTML = (SUGG.length ? '' : '<div class="empty">조건에 맞는 페어가 없어요</div>') + SUGG.map((p, i) =>
     '<div class="sg"><div><div class="pair">' + esc(p.m.name) + ' <span class="meta">' + esc(normSchool(p.m.school) + ' ' + p.m.age + ' ' + p.m.mbti) + '</span> ↔ ' + esc(p.f.name) + ' <span class="meta">' + esc(normSchool(p.f.school) + ' ' + p.f.age + ' ' + p.f.mbti) + '</span><span class="score">' + p.shown + '</span></div>' +
     '<div class="why">' + esc(p.why.join(' · ')) + '</div></div><button class="btn b-pink" onclick="useSugg(' + i + ')">슬롯에 넣기</button></div>'
-  ).join('') + (SUGG.length ? '<div class="meta" style="margin-top:4px">짝 없는 소개팅 신청자 ' + left + '명 (성비·조건 때문에 남음)</div>' : '');
+  ).join('') + (SUGG.length ? '<div class="meta" style="margin-top:4px">대상 남 ' + men.length + '명 · 여 ' + women.length + '명 → 짝 없이 남은 ' + left + '명 (성비·조건 때문)</div>' : '');
+  document.getElementById('bulkBox').style.display = SUGG.length ? '' : 'none';
+  document.getElementById('bulkBtn').textContent = '📱 추천 ' + SUGG.length + '쌍 전체 발송 (문자 ' + SUGG.length * 2 + '통)';
+  document.getElementById('bulkStatus').textContent = '';
+}
+
+// 추천 페어 일괄 발송 — 한 쌍씩 순서대로 보냄 (결과는 매칭 로그 탭에서 확인)
+async function sendAllSugg() {
+  if (!SUGG.length) return;
+  const list = SUGG.map((p, i) => (i + 1) + '. ' + p.m.name + ' ↔ ' + p.f.name).join('\n');
+  if (!confirm('아래 ' + SUGG.length + '쌍에게 매칭 결과 문자를 보냅니다 (총 ' + SUGG.length * 2 + '통).\n\n' + list + '\n\n정말 보낼까요?')) return;
+  const noPhone = SUGG.filter(p => !p.m.phone || !p.f.phone);
+  if (noPhone.length && !confirm('전화번호 없는 사람이 있는 ' + noPhone.length + '쌍은 건너뜁니다. 계속할까요?')) return;
+  const btn = document.getElementById('bulkBtn'), st = document.getElementById('bulkStatus');
+  btn.disabled = true;
+  const apiUrl = document.getElementById('apiUrl').value.trim(), key = document.getElementById('adminKey').value.trim();
+  const base = siteBase() + '/match.html?q=';
+  const cmt = document.getElementById('comment');
+  const savedCmt = cmt.value; cmt.value = '';   // 일괄 발송엔 운영진 한마디를 넣지 않음
+  let done = 0, skipped = 0;
+  for (const p of SUGG) {
+    if (!p.m.phone || !p.f.phone) { skipped++; continue; }
+    st.className = 'status'; st.textContent = '⏳ 발송 중 ' + (done + 1) + ' / ' + SUGG.length + ' — ' + p.m.name + ' ↔ ' + p.f.name;
+    try {
+      await fetch(apiUrl, {
+        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          type: 'hyMatch', key: key,
+          a: { name: p.m.name, phone: p.m.phone, url: base + hexEnc(payload(p.f)), row: p.m.row },
+          b: { name: p.f.name, phone: p.f.phone, url: base + hexEnc(payload(p.m)), row: p.f.row }
+        })
+      });
+      done++;
+    } catch (e) { skipped++; }
+    await new Promise(r => setTimeout(r, 1200));
+  }
+  cmt.value = savedCmt;
+  st.className = 'status ok';
+  st.textContent = '✓ ' + done + '쌍 발송 요청 완료' + (skipped ? ' · ' + skipped + '쌍 건너뜀' : '') + ' — 실제 성공/실패는 운영 시트 "냥대팅_매칭_로그" 탭에서 확인';
+  btn.disabled = false;
+  setTimeout(async () => { await loadApplicants(); suggest(); }, 4000);
 }
 function useSugg(i) {
   const p = SUGG[i]; if (!p) return;
