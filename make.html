@@ -315,7 +315,17 @@ function pairEval(m, f) {
 let SUGG = [];
 function suggest() {
   const onlyReady = document.getElementById('onlyReady').checked;
-  const pool = APPLICANTS.filter(a => !isMatched(a) && evKind(a) === '소개팅' && (!onlyReady || isReady(a)));
+  // 같은 사람이 여러 번 신청한 경우(전화번호 같음) 한 명으로 묶음: 한 줄이라도 매칭됐으면 제외, 아니면 가장 최근 신청서만 사용
+  const phoneOf = a => String(a.phone || '').replace(/[^0-9]/g, '') || ('row' + a.row);
+  const matchedPhones = new Set(APPLICANTS.filter(isMatched).map(phoneOf));
+  const latest = {};
+  APPLICANTS.forEach(a => {
+    if (evKind(a) !== '소개팅' || matchedPhones.has(phoneOf(a))) return;
+    if (onlyReady && !isReady(a)) return;
+    const k = phoneOf(a);
+    if (!latest[k] || a.row > latest[k].row) latest[k] = a;
+  });
+  const pool = Object.values(latest);
   const men = pool.filter(a => a.gender === '남자'), women = pool.filter(a => a.gender === '여자');
   const order = a => new Date(a.ts).getTime() || a.row;
   const pairs = [];
@@ -325,7 +335,7 @@ function suggest() {
   }));
   pairs.sort((a, b) => b.score - a.score);
   const used = new Set(); SUGG = [];
-  pairs.forEach(p => { if (used.has(p.m.row) || used.has(p.f.row)) return; used.add(p.m.row); used.add(p.f.row); SUGG.push(p); });
+  pairs.forEach(p => { const km = phoneOf(p.m), kf = phoneOf(p.f); if (used.has(km) || used.has(kf)) return; used.add(km); used.add(kf); SUGG.push(p); });
   const el = document.getElementById('sugg');
   if (!APPLICANTS.length) { el.innerHTML = '<div class="empty">먼저 신청자를 불러오세요</div>'; return; }
   const left = pool.length - SUGG.length * 2;
