@@ -262,7 +262,11 @@ function normSchool(s) {
   if (/한양여/.test(s)) return '한양여대';
   if (/한양/.test(s)) return '한양대';
   if (/외대|외국어/.test(s)) return '외대';
-  return s.replace(/대학교$/, '대').replace(/학교$/, '');
+  if (/시립/.test(s)) return '서울시립대';
+  if (/한예종|한국예술종합/.test(s)) return '한예종';
+  if (/서울과기|서울과학기술/.test(s)) return '서울과기대';
+  if (/백석예/.test(s)) return '백석예대';
+  return s.replace(/여자대학교$/, '여대').replace(/대학교$/, '대').replace(/학교$/, '');
 }
 function majorName(m) { return String(m || '').split(/[\/|,]/)[0].replace(/\s/g, ''); }
 function gradeOf(m) { const x = String(m || '').match(/([1-6])\s*학년/); return x ? Number(x[1]) : null; }

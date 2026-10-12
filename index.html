@@ -88,7 +88,7 @@ button{font-family:inherit;cursor:pointer}
 .marquee::before,.marquee::after{content:"";position:absolute;top:0;bottom:0;width:60px;z-index:2}
 .marquee::before{left:0;background:linear-gradient(90deg,#fff,transparent)}
 .marquee::after{right:0;background:linear-gradient(-90deg,#fff,transparent)}
-.mq-track{display:flex;gap:10px;width:max-content;animation:mq 38s linear infinite}
+.mq-track{display:flex;gap:10px;width:max-content;animation:mq 70s linear infinite}
 .mq-track span{white-space:nowrap;font-size:14px;font-weight:700;color:var(--sub);padding:8px 16px;border:1px solid var(--line);border-radius:99px;background:var(--bg)}
 .mq-track span.hl{background:var(--navy);color:#fff;border-color:var(--navy)}
 @keyframes mq{to{transform:translateX(-50%)}}
@@ -187,6 +187,9 @@ textarea{resize:vertical;min-height:76px}
 .quick button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-size:12.5px;font-weight:600;color:var(--sub);transition:all .15s}
 .quick button:hover{border-color:var(--sky-2);color:var(--blue)}
 .quick button:active{background:var(--sky)}
+.quick .more{display:contents}
+.quick .more[hidden]{display:none}
+.quick .more-btn{border-style:dashed;color:var(--blue);font-weight:700}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .pay{background:linear-gradient(135deg,#f1f6fd,#fdf3f7);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
 .pay #payLabel{font-size:13px;color:var(--muted);font-weight:600}
@@ -328,8 +331,8 @@ footer b{color:rgba(255,255,255,.85)}
 
 <div class="marquee" aria-label="참여 학교">
   <div class="mq-track">
-    <span class="hl">한양대</span><span>한양여대</span><span>고려대</span><span>경희대</span><span>외대</span><span>이화여대</span><span>숙명여대</span><span>동덕여대</span><span>건국대</span><span>세종대</span><span class="hl">+ 서울권 누구나</span>
-    <span class="hl">한양대</span><span>한양여대</span><span>고려대</span><span>경희대</span><span>외대</span><span>이화여대</span><span>숙명여대</span><span>동덕여대</span><span>건국대</span><span>세종대</span><span class="hl">+ 서울권 누구나</span>
+    <span class="hl">한양대</span><span>한양여대</span><span>숙명여대</span><span>성신여대</span><span>이화여대</span><span>성균관대</span><span>세종대</span><span>건국대</span><span>외대</span><span>경희대</span><span>서울시립대</span><span>고려대</span><span>중앙대</span><span>연세대</span><span>서강대</span><span>동국대</span><span>홍익대</span><span>국민대</span><span>상명대</span><span>한예종</span><span>동덕여대</span><span>덕성여대</span><span class="hl">+ 서울권 누구나</span>
+    <span class="hl">한양대</span><span>한양여대</span><span>숙명여대</span><span>성신여대</span><span>이화여대</span><span>성균관대</span><span>세종대</span><span>건국대</span><span>외대</span><span>경희대</span><span>서울시립대</span><span>고려대</span><span>중앙대</span><span>연세대</span><span>서강대</span><span>동국대</span><span>홍익대</span><span>국민대</span><span>상명대</span><span>한예종</span><span>동덕여대</span><span>덕성여대</span><span class="hl">+ 서울권 누구나</span>
   </div>
 </div>
 
@@ -478,10 +481,12 @@ footer b{color:rgba(255,255,255,.85)}
             </div>
             <div class="field" data-f="school">
               <label class="l" for="school">재학 중인 학교 <i>*</i></label>
-              <input type="text" id="school" name="school" placeholder="예: 한양대" maxlength="30">
+              <input type="text" id="school" name="school" placeholder="학교 이름을 입력하면 목록이 나와요" maxlength="30" list="schoolList" autocomplete="off">
               <div class="quick" data-target="school">
-                <button type="button">한양대</button><button type="button">한양여대</button><button type="button">고려대</button><button type="button">경희대</button><button type="button">외대</button><button type="button">이화여대</button><button type="button">숙명여대</button><button type="button">동덕여대</button><button type="button">건국대</button><button type="button">세종대</button>
+                <button type="button">한양대</button><button type="button">한양여대</button><button type="button">숙명여대</button><button type="button">성신여대</button><button type="button">이화여대</button><button type="button">성균관대</button><button type="button">세종대</button><button type="button">건국대</button><button type="button">외대</button><button type="button">경희대</button><button type="button">서울시립대</button><button type="button">고려대</button><button type="button" class="more-btn" id="schoolMore">+ 더보기</button>
+                <span class="more" id="schoolMoreList" hidden><button type="button">중앙대</button><button type="button">연세대</button><button type="button">서강대</button><button type="button">동국대</button><button type="button">홍익대</button><button type="button">국민대</button><button type="button">숭실대</button><button type="button">광운대</button><button type="button">상명대</button><button type="button">한예종</button><button type="button">동덕여대</button><button type="button">덕성여대</button><button type="button">서울여대</button><button type="button">명지대</button><button type="button">단국대</button><button type="button">가톨릭대</button><button type="button">서울과기대</button><button type="button">한성대</button><button type="button">삼육대</button><button type="button">서울대</button><button type="button">백석예대</button><button type="button">서울예대</button><button type="button">인덕대</button><button type="button">가천대</button></span>
               </div>
+              <datalist id="schoolList"><option value="한양대"><option value="한양여대"><option value="숙명여대"><option value="성신여대"><option value="이화여대"><option value="성균관대"><option value="세종대"><option value="건국대"><option value="외대"><option value="경희대"><option value="서울시립대"><option value="고려대"><option value="중앙대"><option value="연세대"><option value="서강대"><option value="동국대"><option value="홍익대"><option value="국민대"><option value="숭실대"><option value="광운대"><option value="상명대"><option value="한예종"><option value="동덕여대"><option value="덕성여대"><option value="서울여대"><option value="명지대"><option value="단국대"><option value="가톨릭대"><option value="서울과기대"><option value="한성대"><option value="삼육대"><option value="서울대"><option value="백석예대"><option value="서울예대"><option value="인덕대"><option value="가천대"><option value="성공회대"><option value="서경대"><option value="한국체대"><option value="서울교대"><option value="배화여대"><option value="숭의여대"><option value="삼육보건대"><option value="명지전문대"><option value="동양미래대"><option value="서일대"><option value="경기대"><option value="아주대"><option value="인하대"><option value="한국항공대"><option value="강남대"><option value="한신대"><option value="수원대"><option value="용인대"><option value="협성대"><option value="고려대 세종"><option value="경희대 국제"><option value="한양대 ERICA"><option value="단국대 죽전"><option value="상명대 천안"></datalist>
               <p class="err">학교 이름을 정확히 적어주세요</p>
             </div>
             <div class="field" data-f="major">
@@ -680,6 +685,11 @@ document.getElementById('seasonLabel').textContent = SEASON_LABEL;
   } catch (e) { }
 })();
 
+// 학교 더보기
+(function () {
+  const btn = document.getElementById('schoolMore'), more = document.getElementById('schoolMoreList');
+  if (btn) btn.addEventListener('click', e => { e.stopPropagation(); more.hidden = false; btn.remove(); });
+})();
 // 빠른 입력 칩
 document.querySelectorAll('.quick').forEach(q => {
   q.addEventListener('click', e => {
