@@ -157,7 +157,7 @@ async function loadByCode(code) {
   $('codeBox').hidden = true; $('env').style.display = 'none'; $('loading').hidden = false;
   for (let i = 0; i < 3; i++) {
     try {
-      const r = await fetch(API_URL + '?action=hyView&c=' + code + '&t=' + Date.now(), { cache: 'no-store' });
+      const r = await fetch(API_URL + '?action=hyView&code=' + code + '&t=' + Date.now(), { cache: 'no-store' });
       const j = await r.json();
       if (j && j.view && valid(j.view)) {
         d = j.view;
