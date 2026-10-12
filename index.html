@@ -35,6 +35,8 @@ button{font-family:inherit;cursor:pointer}
 .logo .m{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:18px}
 .top-cta{background:#fff;color:var(--navy);border-radius:99px;padding:9px 18px;font-size:13.5px;font-weight:750;text-decoration:none;transition:transform .15s}
 .top-cta:active{transform:scale(.97)}
+.top-res{color:#fff;font-size:13px;font-weight:700;text-decoration:none;padding:9px 10px;border-radius:99px;background:rgba(255,255,255,.1)}
+.top.scrolled .top-res{color:var(--navy);background:var(--sky)}
 .top.scrolled{background:rgba(255,255,255,.88);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);box-shadow:0 1px 0 var(--line)}
 .top.scrolled .logo{color:var(--navy)}
 .top.scrolled .logo .m{background:var(--sky)}
@@ -287,7 +289,7 @@ footer b{color:rgba(255,255,255,.85)}
 <header class="top" id="topbar">
   <div class="wrap">
     <a class="logo" href="#"><span class="m">🦁</span>냥대팅</a>
-    <a class="top-cta" href="#apply">신청하기</a>
+    <div style="display:flex;gap:6px;align-items:center"><a class="top-res" href="match">🔑 결과 확인</a><a class="top-cta" href="#apply">신청하기</a></div>
   </div>
 </header>
 
@@ -300,6 +302,7 @@ footer b{color:rgba(255,255,255,.85)}
       <div class="hero-ctas">
         <a class="btn btn-primary" href="#apply">냥대팅 신청하기 <span aria-hidden="true">→</span></a>
         <a class="btn btn-ghost" href="#how">어떻게 진행돼요?</a>
+        <a class="btn btn-ghost" href="match">🔑 매칭 결과 확인</a>
       </div>
       <div class="hero-meta">
         <span id="deadlineText"><span class="dot"></span>신청서 작성 1분</span>

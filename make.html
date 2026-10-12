@@ -370,8 +370,8 @@ async function sendAllSugg() {
         method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           type: 'hyMatch', key: key,
-          a: { name: p.m.name, phone: p.m.phone, url: base + hexEnc(payload(p.f)), row: p.m.row },
-          b: { name: p.f.name, phone: p.f.phone, url: base + hexEnc(payload(p.m)), row: p.f.row }
+          a: { name: p.m.name, phone: p.m.phone, url: base + hexEnc(payload(p.f)), view: payload(p.f), row: p.m.row },
+          b: { name: p.f.name, phone: p.f.phone, url: base + hexEnc(payload(p.m)), view: payload(p.m), row: p.f.row }
         })
       });
       done++;
@@ -453,9 +453,10 @@ function siteBase() {
 }
 try { document.getElementById('adminKey').value = localStorage.getItem('hy_admin_key') || ''; } catch (e) { }
 window.addEventListener('DOMContentLoaded', () => { if (location.protocol.startsWith('http')) document.getElementById('baseUrl').value = siteBase(); });
+// 실제 문자의 코드·짧은 링크는 발송할 때 서버가 만듦 (미리보기는 예시 코드)
 function smsText(name, url) {
-  return '[냥대팅] ' + name + '님, 매칭 결과가 도착했어요 🦁💙\n\n아래 링크에서 상대 프로필과 연락처를 확인하세요:\n' + url +
-    '\n\n먼저 인사 건네보는 것도 좋아요 :)\n\n※ 본 번호는 발송 전용입니다 (응대 불가)\n문의는 냥대팅 오픈채팅으로 부탁드려요';
+  return '[냥대팅] ' + name + '님, 매칭 결과가 도착했어요 🦁💙\n\n👉 결과 보기\nhttps://hannyang.site/match?c=ABC123\n\n🔑 결과 코드: ABC123\n링크가 안 눌리면 hannyang.site 접속 → [매칭 결과 확인]에 코드를 입력하세요' +
+    '\n\n먼저 인사 건네보는 것도 좋아요 :)\n\n※ 본 번호는 발송 전용입니다 (응대 불가)\n문의는 냥대팅 오픈채팅으로 부탁드려요\n\n(ABC123은 예시 — 실제 코드는 발송할 때 생성돼요)';
 }
 function hideRes() { document.getElementById('res').classList.add('hidden'); document.getElementById('sendStatus').textContent = ''; }
 function generate() {
@@ -482,8 +483,8 @@ async function sendSms() {
       body: JSON.stringify({
         type: 'hyMatch',
         key: document.getElementById('adminKey').value.trim(),
-        a: { name: slotA.name, phone: slotA.phone, url: document.getElementById('urlA').value, row: slotA.row },
-        b: { name: slotB.name, phone: slotB.phone, url: document.getElementById('urlB').value, row: slotB.row }
+        a: { name: slotA.name, phone: slotA.phone, url: document.getElementById('urlA').value, view: payload(slotB), row: slotA.row },
+        b: { name: slotB.name, phone: slotB.phone, url: document.getElementById('urlB').value, view: payload(slotA), row: slotB.row }
       })
     });
     st.className = 'status ok';

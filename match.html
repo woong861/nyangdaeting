@@ -50,6 +50,14 @@ h1{color:#fff;font-size:30px;text-align:center;margin:6px 0 22px;line-height:1.2
 .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
 .toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;transition:.2s;pointer-events:none}
 .toast.on{opacity:1}
+.codebox{background:#fff;border-radius:24px;box-shadow:0 18px 40px rgba(6,30,60,.25);padding:30px 22px;text-align:center}
+#codeForm{display:flex;gap:8px;margin-top:16px}
+#codeInput{flex:1;min-width:0;border:2px solid var(--line);border-radius:14px;padding:14px;font-size:22px;font-weight:900;letter-spacing:.25em;text-align:center;text-transform:uppercase;font-family:inherit;color:var(--ink)}
+#codeInput:focus{outline:0;border-color:var(--blue2)}
+#codeForm button{border:0;background:var(--blue);color:#fff;border-radius:14px;padding:0 18px;font-weight:800;font-size:15px;font-family:inherit;white-space:nowrap}
+.cerr{color:#d93d4a;font-size:13px;font-weight:700;margin-top:10px;min-height:1em}
+.spin{width:38px;height:38px;margin:0 auto;border-radius:50%;border:4px solid var(--sky);border-top-color:var(--blue2);animation:sp 0.9s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -90,10 +98,27 @@ h1{color:#fff;font-size:30px;text-align:center;margin:6px 0 22px;line-height:1.2
     </div>
   </div>
 
+  <div class="codebox" id="codeBox" hidden>
+    <div style="font-size:40px">🔑</div>
+    <p style="font-weight:900;margin-top:6px;font-size:17px">결과 코드를 입력해주세요</p>
+    <p style="color:var(--muted);font-size:13px;margin-top:4px">문자에 적힌 6자리 코드 (예: K3P9QX)</p>
+    <form id="codeForm" autocomplete="off">
+      <input id="codeInput" maxlength="6" placeholder="ABC123" autocapitalize="characters" spellcheck="false">
+      <button type="submit">결과 보기</button>
+    </form>
+    <p class="cerr" id="codeErr"></p>
+  </div>
+
+  <div class="codebox" id="loading" hidden>
+    <div class="spin"></div>
+    <p style="font-weight:800;margin-top:12px">결과를 불러오는 중이에요…</p>
+    <p style="color:var(--muted);font-size:12.5px;margin-top:4px">처음엔 몇 초 걸릴 수 있어요</p>
+  </div>
+
   <div class="err" id="err">
     <div style="font-size:44px">🦁</div>
     <p style="font-weight:900;margin-top:8px">링크가 올바르지 않아요</p>
-    <p style="color:var(--muted);font-size:13px;margin-top:6px">문자로 받은 링크 전체를 다시 눌러주세요.<br>계속 안 되면 냥대팅 오픈채팅으로 알려주세요.</p>
+    <p style="color:var(--muted);font-size:13px;margin-top:6px">문자로 받은 링크 전체를 다시 눌러주세요.<br>결과 코드가 있다면 <a href="match" style="color:var(--blue2);font-weight:700">여기서 코드로 확인</a>할 수 있어요.<br>계속 안 되면 냥대팅 오픈채팅으로 알려주세요.</p>
   </div>
 
   <p class="foot">🦁 냥대팅 — 좋은 인연 되길 바라요 💙</p>
@@ -118,13 +143,47 @@ function decodeHex(h) {
     return JSON.parse(new TextDecoder().decode(bytes));
   } catch (e) { return null; }
 }
+const API_URL = 'https://script.google.com/macros/s/AKfycby3y0A00gmuDX3DMJlW4qTYeL90ecwjr1BATbf4GgAZYUlZ8qcJBITmJohRraMDa80a/exec';
 const qs = new URLSearchParams(location.search);
-const q = qs.get('q'), p = qs.get('p');
-const d = q ? decodeHex(q) : p ? decode(p) : null;
+const q = qs.get('q'), p = qs.get('p'), c = qs.get('c');
+let d = q ? decodeHex(q) : p ? decode(p) : null;
 const $ = id => document.getElementById(id);
-if (!d || !(d.s || d.a || d.k || d.i)) {
+const valid = x => x && (x.s || x.a || x.k || x.i);
+
+// c = 6자리 결과 코드 (짧은 링크) — 서버에서 상대 프로필을 받아옴
+async function loadByCode(code) {
+  code = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (code.length !== 6) { $('codeErr').textContent = '코드 6자리를 확인해주세요'; return false; }
+  $('codeBox').hidden = true; $('env').style.display = 'none'; $('loading').hidden = false;
+  for (let i = 0; i < 3; i++) {
+    try {
+      const r = await fetch(API_URL + '?action=hyView&c=' + code + '&t=' + Date.now(), { cache: 'no-store' });
+      const j = await r.json();
+      if (j && j.view && valid(j.view)) {
+        d = j.view;
+        $('loading').hidden = true; $('env').style.display = '';
+        if (!qs.get('c')) history.replaceState(null, '', 'match?c=' + code);
+        return true;
+      }
+      if (j && j.error) break;
+    } catch (e) { await new Promise(r => setTimeout(r, 1500)); }
+  }
+  $('loading').hidden = true; $('codeBox').hidden = false;
+  $('codeInput').value = code;
+  $('codeErr').textContent = '코드를 찾을 수 없어요. 문자에 적힌 코드를 다시 확인해주세요.';
+  return false;
+}
+$('codeForm').addEventListener('submit', e => { e.preventDefault(); $('codeErr').textContent = ''; loadByCode($('codeInput').value); });
+$('codeInput').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
+
+if (c) {
+  loadByCode(c);
+} else if (q || p) {
+  if (!valid(d)) { $('env').style.display = 'none'; $('err').classList.add('on'); }
+} else {
+  // 아무 값 없이 열면 코드 입력 화면
   $('env').style.display = 'none';
-  $('err').classList.add('on');
+  $('codeBox').hidden = false;
 }
 function reveal() {
   if (!d) return;
