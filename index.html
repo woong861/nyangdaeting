@@ -348,7 +348,7 @@ footer b{color:rgba(255,255,255,.85)}
       <div class="f rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.6-3 8.3-7 10-4-1.7-7-5.4-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><strong>학과·학년 거르기</strong><small>피하고 싶은 학과·학년은 매칭에서 빼드려요</small></div>
       <div class="f rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg></div><strong>MBTI·이상형 반영</strong><small>적어주신 이상형을 보고 직접 골라요</small></div>
       <div class="f rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><path d="M3 10l9-5 9 5-9 5z"/><path d="M7 12.2V16c1.4 1.4 3 2 5 2s3.6-.6 5-2v-3.8"/></svg></div><strong>같은 학교만도 가능</strong><small>다른 학교 OK / 같은 학교만 선택</small></div>
-      <div class="f p rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div><strong>여학우 소개팅 무료</strong><small>미팅은 남 6,000원 · 여 3,000원 (1인)</small></div>
+      <div class="f p rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div><strong>여학우는 3,000원</strong><small>소개팅·미팅 모두 1인 3,000원</small></div>
       <div class="f rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg></div><strong>안 되면 환불</strong><small>재학·휴학·졸업생 누구나, 매칭 실패 시 환불</small></div>
     </div>
   </div>
@@ -362,12 +362,12 @@ footer b{color:rgba(255,255,255,.85)}
     </div>
     <div class="price">
       <div class="pcard hot rv">
-        <span class="ribbon">여학우 무료</span>
+        <span class="ribbon">여학우 3,000원</span>
         <div class="k"><h3>소개팅</h3><span class="tag">1:1</span></div>
         <p class="d">딱 맞는 한 사람과 연결해드려요</p>
         <div class="lines">
-          <div class="ln"><span>남학우</span><b>15,000<small>원</small></b></div>
-          <div class="ln"><span>여학우</span><span class="free">무료</span></div>
+          <div class="ln"><span>남학우</span><b>17,000<small>원</small></b></div>
+          <div class="ln"><span>여학우</span><b>3,000<small>원</small></b></div>
         </div>
       </div>
       <div class="pcard rv">
@@ -708,11 +708,11 @@ function val(name) {
   return (el.value || '').trim();
 }
 
-// 금액 안내 — 소개팅: 남 15,000 / 여 무료, 미팅(1인): 남 6,000 / 여 3,000
+// 금액 안내 — 소개팅: 남 17,000 / 여 3,000, 미팅(1인): 남 6,000 / 여 3,000
 function priceOf(ev, g) {
   if (!ev || !g) return null;
   if (ev.startsWith('미팅')) return g === '여자' ? 3000 : 6000;
-  return g === '여자' ? 0 : 15000;
+  return g === '여자' ? 3000 : 17000;
 }
 function updatePay() {
   const ev = val('event_type'), g = val('gender');
