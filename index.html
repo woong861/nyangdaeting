@@ -195,6 +195,7 @@ textarea{resize:vertical;min-height:76px}
 .pay #payLabel{font-size:13px;color:var(--muted);font-weight:600}
 .pay .amount{font-size:28px;font-weight:850;color:var(--navy);letter-spacing:-.03em;margin-top:2px}
 .pay .amount.free{color:var(--pink)}
+.dep-note{font-size:13px;color:#c22c5f;background:#fff;border-radius:10px;padding:9px 12px;margin-top:10px;line-height:1.5}
 .pay .acct{background:#fff;border-radius:12px;padding:11px 13px;margin-top:12px;font-size:13.5px;color:var(--sub)}
 .pay .acct b{color:var(--ink)}
 .agree{display:flex;gap:11px;align-items:flex-start;font-size:13.5px;color:var(--sub);background:#fafbfd;border:1px solid var(--line);border-radius:14px;padding:14px 15px;margin-bottom:10px;cursor:pointer;line-height:1.55}
@@ -348,7 +349,7 @@ footer b{color:rgba(255,255,255,.85)}
       <div class="f rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.6-3 8.3-7 10-4-1.7-7-5.4-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><strong>학과·학년 거르기</strong><small>피하고 싶은 학과·학년은 매칭에서 빼드려요</small></div>
       <div class="f rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg></div><strong>MBTI·이상형 반영</strong><small>적어주신 이상형을 보고 직접 골라요</small></div>
       <div class="f rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><path d="M3 10l9-5 9 5-9 5z"/><path d="M7 12.2V16c1.4 1.4 3 2 5 2s3.6-.6 5-2v-3.8"/></svg></div><strong>같은 학교만도 가능</strong><small>다른 학교 OK / 같은 학교만 선택</small></div>
-      <div class="f p rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div><strong>여학우는 3,000원</strong><small>소개팅·미팅 모두 1인 3,000원</small></div>
+      <div class="f p rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div><strong>여학우 소개팅 무료</strong><small>보증금 5,000원만 받고 돌려드려요</small></div>
       <div class="f rv"><div class="fi"><svg class="ico" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg></div><strong>안 되면 환불</strong><small>재학·휴학·졸업생 누구나, 매칭 실패 시 환불</small></div>
     </div>
   </div>
@@ -362,12 +363,13 @@ footer b{color:rgba(255,255,255,.85)}
     </div>
     <div class="price">
       <div class="pcard hot rv">
-        <span class="ribbon">여학우 3,000원</span>
+        <span class="ribbon">여학우 참가비 무료</span>
         <div class="k"><h3>소개팅</h3><span class="tag">1:1</span></div>
         <p class="d">딱 맞는 한 사람과 연결해드려요</p>
         <div class="lines">
           <div class="ln"><span>남학우</span><b>17,000<small>원</small></b></div>
-          <div class="ln"><span>여학우</span><b>3,000<small>원</small></b></div>
+          <div class="ln"><span>여학우</span><span class="free">무료</span></div>
+          <p class="d" style="margin-top:2px">여학우는 <b>보증금 5,000원</b> — 매칭 후 연락하거나 매칭이 안 되면 돌려드려요</p>
         </div>
       </div>
       <div class="pcard rv">
@@ -543,6 +545,7 @@ footer b{color:rgba(255,255,255,.85)}
             <div class="pay">
               <div id="payLabel">유형과 성별을 고르면 금액이 나와요</div>
               <div class="amount" id="payAmount">—</div>
+              <p class="dep-note" id="depositNote" hidden>💙 보증금은 매칭 후 상대에게 연락하거나, 매칭이 안 되면 돌려드려요. 연락 무시·노쇼 시엔 돌려드리지 않아요.</p>
               <div class="acct" id="acctBox">입금 계좌는 <b>신청서 제출 후 완료 화면</b>에서 알려드려요.</div>
             </div>
             <input type="hidden" id="payment" name="payment">
@@ -595,6 +598,7 @@ footer b{color:rgba(255,255,255,.85)}
     <details class="rv"><summary>한양대생만 신청할 수 있나요?</summary><p>아니요! 한양대·한양여대는 물론 이화여대·숙명여대·동덕여대·건국대·세종대 등 서울권 대학 재학생·휴학생·졸업생 누구나 신청할 수 있어요. 같은 학교 사람만 원하면 '같은 학교만!'을 골라주세요.</p></details>
     <details class="rv"><summary>미팅은 어떻게 신청해요?</summary><p>2:2 또는 3:3을 고르고, 함께할 친구와 같이 신청해주세요. 타학교 친구도 괜찮아요. 미팅은 1인 신청이 안 되고, 참가비는 1인당 남학우 6,000원, 여학우 3,000원이에요.</p></details>
     <details class="rv"><summary>아는 사람이랑 매칭될까 봐 걱정돼요</summary><p>'피하고 싶은 학과/학년'에 적어주시면 그 조건은 매칭에서 빼드려요. 예: 같은 과 X, 16학번 이상 X.</p></details>
+    <details class="rv"><summary>여학우 보증금은 언제 돌려받아요?</summary><p>여학우 소개팅은 참가비가 무료이고, 보증금 5,000원만 받아요. 매칭 후 상대에게 연락하거나, 매칭이 안 되면 적어주신 계좌로 돌려드려요. 매칭 후 연락을 무시하거나 노쇼하면 돌려드리지 않아요.</p></details>
     <details class="rv"><summary>매칭이 안 되면요?</summary><p>적어주신 환불 계좌로 참가비를 돌려드려요.</p></details>
     <details class="rv"><summary>결과는 어떻게 알려줘요?</summary><p>매칭되면 적어주신 번호로 문자가 가요. 링크를 열면 상대의 학교·나이·MBTI·자기소개와 카톡·인스타 ID가 나와요. 이름과 전화번호는 상대에게 보이지 않아요.</p></details>
     <details class="rv"><summary>문의는 어디로 해요?</summary><p><a href="https://open.kakao.com/o/sy7hqPQi" target="_blank" rel="noopener" style="color:var(--blue-2);font-weight:700">냥대팅 오픈채팅</a>으로 편하게 물어봐주세요.</p></details>
@@ -712,14 +716,17 @@ function val(name) {
 function priceOf(ev, g) {
   if (!ev || !g) return null;
   if (ev.startsWith('미팅')) return g === '여자' ? 3000 : 6000;
-  return g === '여자' ? 3000 : 17000;
+  return g === '여자' ? 5000 : 17000;   // 여학우 소개팅은 참가비 무료 + 보증금 5,000원
 }
+// 여학우 소개팅 = 보증금 (매칭 후 연락하거나 매칭 안 되면 돌려줌)
+const DEPOSIT_NOTE = '매칭 후 상대에게 연락하거나, 매칭이 안 되면 돌려드려요. 연락 무시·노쇼 시엔 돌려드리지 않아요.';
+function isDeposit(ev, g) { return !!ev && !ev.startsWith('미팅') && g === '여자'; }
 function updatePay() {
   const ev = val('event_type'), g = val('gender');
   const label = $('#payLabel'), amt = $('#payAmount'), refund = $('#refund');
   $('#meetHint').hidden = !ev.startsWith('미팅');
   const p = priceOf(ev, g);
-  if (p === null) { label.textContent = '유형과 성별을 고르면 금액이 나와요'; amt.textContent = '—'; amt.classList.remove('free'); $('#acctBox').style.display = 'none'; return; }
+  if (p === null) { label.textContent = '유형과 성별을 고르면 금액이 나와요'; amt.textContent = '—'; amt.classList.remove('free'); $('#acctBox').style.display = 'none'; $('#depositNote').hidden = true; return; }
   const isMeet = ev.startsWith('미팅');
   label.textContent = isMeet ? '미팅 · ' + (g === '여자' ? '여학우' : '남학우') + ' 1인 (1인 신청 불가)' : '소개팅 1:1 · ' + (g === '여자' ? '여학우' : '남학우');
   if (p === 0) {
@@ -728,13 +735,15 @@ function updatePay() {
     $('[data-f="refund"]').style.display = 'none';
     if (!refund.value || refund.dataset.auto) { refund.value = '없음 (무료)'; refund.dataset.auto = '1'; }
   } else {
-    amt.textContent = (isMeet ? '1인 ' : '') + p.toLocaleString('ko-KR') + '원'; amt.classList.remove('free');
+    amt.textContent = isDeposit(ev, g) ? '참가비 무료 · 보증금 ' + p.toLocaleString('ko-KR') + '원' : (isMeet ? '1인 ' : '') + p.toLocaleString('ko-KR') + '원';
+    amt.classList.remove('free');
+    $('#depositNote').hidden = !isDeposit(ev, g);
     $('#acctBox').style.display = '';
     $('[data-f="refund"]').style.display = '';
     if (refund.dataset.auto) { refund.value = ''; delete refund.dataset.auto; }
   }
   // 입금은 신청 후 안내 → 폼의 입금정보 칸에는 금액/상태를 자동 기록
-  $('#payment').value = p === 0 ? '무료 (여학우 소개팅)' : '입금 전 · ' + p.toLocaleString('ko-KR') + '원' + (isMeet ? '/1인' : '');
+  $('#payment').value = p === 0 ? '무료 (여학우 소개팅)' : isDeposit(ev, g) ? '입금 전 · 보증금 5,000원(여학우 소개팅·참가비 무료)' : '입금 전 · ' + p.toLocaleString('ko-KR') + '원' + (isMeet ? '/1인' : '');
 }
 $('#refund').addEventListener('input', e => { delete e.target.dataset.auto; });
 
@@ -947,8 +956,11 @@ function showDone(g, ev, phone, suspicious) {
   const p = priceOf(ev, g);
   if (p === 0) $('#doneMoney').innerHTML = '참가비 <b>무료</b> — 입금 없이 사진만 보내면 돼요';
   else {
-    const amt = (ev.startsWith('미팅') ? '1인 ' : '') + p.toLocaleString('ko-KR') + '원';
-    $('#doneMoney').innerHTML = '위 계좌로 참가비 <b>' + amt + '</b> 입금하고, <b>입금 캡처</b>도 오픈채팅으로 보내기';
+    const dep = isDeposit(ev, g);
+    const amt = dep ? '보증금 5,000원' : (ev.startsWith('미팅') ? '1인 ' : '') + p.toLocaleString('ko-KR') + '원';
+    $('#doneMoney').innerHTML = dep
+      ? '위 계좌로 <b>보증금 5,000원</b> 입금하고, <b>입금 캡처</b>도 오픈채팅으로 보내기<br><small style="color:var(--muted)">' + DEPOSIT_NOTE + '</small>'
+      : '위 계좌로 참가비 <b>' + amt + '</b> 입금하고, <b>입금 캡처</b>도 오픈채팅으로 보내기';
     $('#pbAmount').textContent = amt;
     $('#pbName').textContent = val('name') || '신청자 이름';
     $('#payBox').hidden = false;
