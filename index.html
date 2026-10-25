@@ -123,6 +123,8 @@ h2{font-size:clamp(28px,6.6vw,38px);line-height:1.25;font-weight:850;letter-spac
 .pcard .ln .free{font-size:22px;font-weight:850;color:var(--pink);letter-spacing:-.03em}
 .pcard.hot{border-color:transparent;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,#ff9cbc,#7fb2f0) border-box;border:1.5px solid transparent}
 .ribbon{position:absolute;right:18px;top:18px;background:var(--pink-soft);color:#e04a7c;font-size:12px;font-weight:800;border-radius:99px;padding:5px 11px}
+.pcard .nb{margin-top:10px;font-size:13.5px;font-weight:700;color:#c2410c;background:#fff4ec;border-radius:10px;padding:8px 11px}
+.nb-inline{color:#c2410c}
 .note{font-size:13.5px;color:var(--muted);margin-top:14px;display:flex;gap:6px;align-items:center}
 
 /* steps timeline */
@@ -375,6 +377,7 @@ footer b{color:rgba(255,255,255,.85)}
       <div class="pcard rv">
         <div class="k"><h3>미팅</h3><span class="tag">2:2 · 3:3</span></div>
         <p class="d">친구와 함께 신청해요 (1인 신청 불가)</p>
+        <p class="nb">💸 만남 비용(식사·술값 등)은 <b>N/1, 당일 정산</b>이 원칙이에요</p>
         <div class="lines">
           <div class="ln"><span>남학우</span><b><small>1인</small>6,000<small>원</small></b></div>
           <div class="ln"><span>여학우</span><b><small>1인</small>3,000<small>원</small></b></div>
@@ -439,7 +442,7 @@ footer b{color:rgba(255,255,255,.85)}
                 <input type="radio" name="event_type" id="ev2" value="미팅 (2대2) (타학교친구와 신청가능)"><label for="ev2">미팅<small>2:2</small></label>
                 <input type="radio" name="event_type" id="ev3" value="미팅 (3대3) (타학교친구와 신청가능)"><label for="ev3">미팅<small>3:3</small></label>
               </div>
-              <p class="hint" id="meetHint" hidden>미팅은 함께할 친구와 같이 신청해요 (타학교 친구 OK). 아래에 같이 나갈 친구 정보를 적어주세요.</p>
+              <p class="hint" id="meetHint" hidden>미팅은 함께할 친구와 같이 신청해요 (타학교 친구 OK). 아래에 같이 나갈 친구 정보를 적어주세요.<br><b class="nb-inline">💸 만남 당일 비용(식사·술값 등)은 참석자 모두 N/1로 그 자리에서 정산해요.</b></p>
               <p class="err">만남 유형을 골라주세요</p>
             </div>
             <div class="field friends" data-f="friends" id="friendsBox" hidden>
@@ -559,7 +562,7 @@ footer b{color:rgba(255,255,255,.85)}
 
           <div class="field" data-f="agree">
             <label class="agree"><input type="checkbox" id="agree"><span>매칭을 위해 위 정보(연락처·카톡·인스타 포함)를 운영진이 확인하고, <b>매칭된 상대에게 카톡·인스타 ID·학교·나이·MBTI·자기소개가 전달</b>되는 데 동의해요.</span></label>
-            <label class="agree"><input type="checkbox" id="agree2"><span>매칭 후 연락 무시·노쇼는 다음 시즌 참여가 제한될 수 있어요.</span></label>
+            <label class="agree"><input type="checkbox" id="agree2"><span>매칭 후 연락 무시·노쇼, <b>미팅 비용 N/1 당일 정산을 안 하는 경우</b>는 이후 참여가 제한될 수 있어요.</span></label>
             <p class="err">두 항목 모두 동의해주세요</p>
           </div>
 
@@ -597,6 +600,7 @@ footer b{color:rgba(255,255,255,.85)}
     </div>
     <details class="rv"><summary>한양대생만 신청할 수 있나요?</summary><p>아니요! 한양대·한양여대는 물론 이화여대·숙명여대·동덕여대·건국대·세종대 등 서울권 대학 재학생·휴학생·졸업생 누구나 신청할 수 있어요. 같은 학교 사람만 원하면 '같은 학교만!'을 골라주세요.</p></details>
     <details class="rv"><summary>미팅은 어떻게 신청해요?</summary><p>2:2 또는 3:3을 고르고, 함께할 친구와 같이 신청해주세요. 타학교 친구도 괜찮아요. 미팅은 1인 신청이 안 되고, 참가비는 1인당 남학우 6,000원, 여학우 3,000원이에요.</p></details>
+    <details class="rv"><summary>미팅 비용은 어떻게 내요?</summary><p>미팅 당일 식사·술값 등 비용은 <b>참석자 모두 N/1(똑같이 나눠서), 그 자리에서 바로 정산</b>하는 게 원칙이에요. 정산을 안 하거나 미루는 경우가 신고되면 이후 냥대팅 참여가 제한될 수 있어요.</p></details>
     <details class="rv"><summary>아는 사람이랑 매칭될까 봐 걱정돼요</summary><p>'피하고 싶은 학과/학년'에 적어주시면 그 조건은 매칭에서 빼드려요. 예: 같은 과 X, 16학번 이상 X.</p></details>
     <details class="rv"><summary>여학우 보증금은 언제 돌려받아요?</summary><p>여학우 소개팅은 참가비가 무료이고, 보증금 5,000원만 받아요. 매칭 후 상대에게 연락하거나, 매칭이 안 되면 적어주신 계좌로 돌려드려요. 매칭 후 연락을 무시하거나 노쇼하면 돌려드리지 않아요.</p></details>
     <details class="rv"><summary>매칭이 안 되면요?</summary><p>적어주신 환불 계좌로 참가비를 돌려드려요.</p></details>
