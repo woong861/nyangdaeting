@@ -132,6 +132,19 @@ textarea{width:100%;min-height:52px;padding:8px 10px;font-size:12px;border:1px s
         </div>
       </div>
 
+      <div class="panel" style="margin-bottom:14px">
+        <div class="ptitle"><span>🃏 카드 매칭 (카드 옵션 신청자)</span><span class="meta" id="cardNeed"></span></div>
+        <div class="meta" style="line-height:1.6;margin-bottom:8px">카드 옵션 신청자를 <b>고르는 사람</b>으로 넣고 후보를 채운 뒤 보내면, 그 사람에게 카드 링크 문자가 가요. 카드를 고르는 순간 두 사람에게 바로 매칭 문자가 가요. (+2장 → 후보 3명, +5장 → 후보 6명)</div>
+        <div class="slot" id="slotP"><button class="x" onclick="clearPicker()" hidden>×</button><div class="lb">🃏 고르는 사람</div><div class="sc"><span class="meta">왼쪽에서 '🃏 고르는 사람'</span></div></div>
+        <div class="slot" id="slotC"><div class="lb">👥 후보 <span id="candCount">0</span>명</div><div class="sc" id="candList"><span class="meta">왼쪽에서 '＋후보' 또는 아래 자동 채우기</span></div></div>
+        <div class="actions">
+          <button class="btn b-sec" onclick="autoFillCands()">🤖 후보 자동 채우기</button>
+          <button class="btn b-sec" onclick="clearCards()">🗑 비우기</button>
+          <button class="btn b-ok" id="cardSendBtn" onclick="sendCards()" disabled>📱 카드 문자 보내기</button>
+        </div>
+        <div class="status" id="cardStatus"></div>
+      </div>
+
       <div class="panel">
         <div class="ptitle">🎯 1:1 매칭</div>
         <div class="slot" id="slotA"><button class="x" onclick="clearSlot('a')" hidden>×</button><div class="lb">🌸 A</div><div class="sc"><span class="meta">왼쪽에서 'A로'</span></div></div>
@@ -251,7 +264,9 @@ function renderList() {
       (a.friends ? '<div class="sub" style="color:#1b64b5">👯 ' + esc(a.friends.replace(/^\[미팅 친구\]\s*/, '')) + '</div>' : '') +
       (a.intro ? '<div class="intro">"' + esc(a.intro) + '"</div>' : '') +
       (a.ideal ? '<div class="sub">💘 ' + esc(a.ideal) + '</div>' : '') +
-      '</div><div class="btns"><button class="btn b-sec" onclick="setSlot(\'a\',' + a.row + ')">A로</button><button class="btn b-sec" onclick="setSlot(\'b\',' + a.row + ')">B로</button></div></div>';
+      (cardOf(a) ? '<div class="sub" style="color:#b45309;font-weight:800">🃏 카드 +' + cardOf(a) + '장 (' + (cardOf(a) + 1) + '명 중 선택)</div>' : '') +
+      '</div><div class="btns"><button class="btn b-sec" onclick="setSlot(\'a\',' + a.row + ')">A로</button><button class="btn b-sec" onclick="setSlot(\'b\',' + a.row + ')">B로</button>' +
+      '<button class="btn b-sec" style="font-size:11.5px" onclick="setPicker(' + a.row + ')">🃏 고르는 사람</button><button class="btn b-sec" style="font-size:11.5px" onclick="addCand(' + a.row + ')">＋후보</button></div></div>';
   }).join('');
 }
 
@@ -317,6 +332,82 @@ function pairEval(m, f) {
   return { score: Math.round(score * 10) / 10, why };
 }
 let SUGG = [];
+// ============ 카드 매칭 ============
+function cardOf(a) { const m = String(a.payment || '').match(/\[카드\+(\d)\]/); return m ? Number(m[1]) : 0; }
+let picker = null, cands = [];
+function needCount() { return picker ? (cardOf(picker) || 2) + 1 : 0; }
+function setPicker(row) {
+  const a = APPLICANTS.find(x => x.row === row); if (!a) return;
+  picker = a; cands = cands.filter(c => c.row !== row && c.gender !== a.gender); renderCards();
+  document.getElementById('slotP').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function addCand(row) {
+  const a = APPLICANTS.find(x => x.row === row); if (!a) return;
+  if (picker && a.row === picker.row) return;
+  if (picker && a.gender === picker.gender) { alert('고르는 사람과 성별이 같아요'); return; }
+  if (cands.some(c => c.row === row)) return;
+  if (picker && cands.length >= needCount()) { alert('후보가 이미 ' + needCount() + '명이에요'); return; }
+  cands.push(a); renderCards();
+}
+function removeCand(row) { cands = cands.filter(c => c.row !== row); renderCards(); }
+function clearPicker() { picker = null; renderCards(); }
+function clearCards() { picker = null; cands = []; renderCards(); document.getElementById('cardStatus').textContent = ''; }
+function autoFillCands() {
+  if (!picker) { alert('먼저 고르는 사람을 넣어주세요'); return; }
+  const phoneOf = a => String(a.phone || '').replace(/[^0-9]/g, '') || ('row' + a.row);
+  const taken = new Set(APPLICANTS.filter(isMatched).map(phoneOf));
+  taken.add(phoneOf(picker)); cands.forEach(c => taken.add(phoneOf(c)));
+  const onlyReady = document.getElementById('onlyReady').checked;
+  const latest = {};
+  APPLICANTS.forEach(a => {
+    if (a.gender === picker.gender || evKind(a) !== '소개팅' || taken.has(phoneOf(a))) return;
+    if (onlyReady && !isReady(a)) return;
+    const k = phoneOf(a); if (!latest[k] || a.row > latest[k].row) latest[k] = a;
+  });
+  const m = picker.gender === '남자' ? picker : null;
+  const scored = Object.values(latest).map(a => ({ a, e: m ? pairEval(picker, a) : pairEval(a, picker) })).filter(x => x.e).sort((x, y) => y.e.score - x.e.score);
+  for (const x of scored) { if (cands.length >= needCount()) break; cands.push(x.a); }
+  renderCards();
+  if (cands.length < needCount()) alert('조건에 맞는 후보가 ' + cands.length + '명뿐이에요 (필요 ' + needCount() + '명)');
+}
+function renderCards() {
+  const p = document.getElementById('slotP');
+  p.querySelector('.x').hidden = !picker;
+  p.querySelector('.sc').innerHTML = picker
+    ? '<div class="nm">' + esc(picker.name) + ' <span class="meta">' + esc([picker.gender, normSchool(picker.school), picker.age + '살', picker.mbti].join(' · ')) + '</span></div><div class="sub">' + (cardOf(picker) ? '🃏 카드 +' + cardOf(picker) + '장 신청 → 후보 ' + needCount() + '명' : '⚠️ 카드 옵션 신청자가 아니에요 (후보 3명 기준)') + '</div>'
+    : '<span class="meta">왼쪽에서 \'🃏 고르는 사람\'</span>';
+  document.getElementById('candCount').textContent = cands.length + (picker ? ' / ' + needCount() : '');
+  document.getElementById('candList').innerHTML = cands.length
+    ? cands.map(c => '<div class="sub" style="display:flex;justify-content:space-between;gap:6px;padding:3px 0"><span><b style="color:#0f1b2d">' + esc(c.name) + '</b> · ' + esc([normSchool(c.school), c.age + '살', c.mbti].join(' · ')) + '</span><button class="mini" onclick="removeCand(' + c.row + ')">빼기</button></div>').join('')
+    : '<span class="meta">왼쪽에서 \'＋후보\' 또는 아래 자동 채우기</span>';
+  document.getElementById('cardNeed').textContent = picker ? '필요 후보 ' + needCount() + '명' : '';
+  document.getElementById('cardSendBtn').disabled = !(picker && cands.length >= 2 && picker.phone);
+}
+async function sendCards() {
+  if (!picker || cands.length < 2) return;
+  if (cands.length !== needCount() && !confirm('후보가 ' + cands.length + '명이에요 (신청 기준 ' + needCount() + '명). 그래도 보낼까요?')) return;
+  if (!confirm(picker.name + ' (' + picker.phone + ')에게 카드 ' + cands.length + '장 문자를 보낼까요?\n\n후보: ' + cands.map(c => c.name).join(', ') + '\n\n카드를 고르면 고른 상대에게 바로 매칭 문자가 가요.')) return;
+  const btn = document.getElementById('cardSendBtn'), st = document.getElementById('cardStatus');
+  btn.disabled = true; st.className = 'status'; st.textContent = '⏳ 보내는 중…';
+  const cmt = document.getElementById('comment'); const savedCmt = cmt.value; cmt.value = '';
+  const body = {
+    type: 'hyPickCreate', key: document.getElementById('adminKey').value.trim(),
+    picker: { name: picker.name, phone: picker.phone, row: picker.row, view: payload(picker) },
+    cands: cands.map(c => ({ name: c.name, phone: c.phone, row: c.row, view: payload(c) }))
+  };
+  cmt.value = savedCmt;
+  try {
+    const r = await fetch(document.getElementById('apiUrl').value.trim(), { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+    const j = await r.json();
+    if (j.error) throw new Error(j.error);
+    st.className = 'status ok';
+    st.innerHTML = (j.sent ? '✓ 카드 문자 발송 완료' : '⚠️ 세션은 만들었지만 문자 실패: ' + esc(j.error || '')) + ' · 링크 <a href="' + esc(j.url) + '" target="_blank">' + esc(j.url) + '</a>';
+    setTimeout(() => { clearCards(); loadApplicants(); }, 2500);
+  } catch (e) {
+    st.className = 'status err'; st.textContent = '❌ ' + (e.message || e); btn.disabled = false;
+  }
+}
+
 function suggest() {
   const onlyReady = document.getElementById('onlyReady').checked;
   // 같은 사람이 여러 번 신청한 경우(전화번호 같음) 한 명으로 묶음: 한 줄이라도 매칭됐으면 제외, 아니면 가장 최근 신청서만 사용
@@ -325,6 +416,7 @@ function suggest() {
   const latest = {};
   APPLICANTS.forEach(a => {
     if (evKind(a) !== '소개팅' || matchedPhones.has(phoneOf(a))) return;
+    if (cardOf(a) || /^카드발송/.test(a.status || '')) return;   // 카드 옵션 신청자는 카드 매칭으로
     if (onlyReady && !isReady(a)) return;
     const k = phoneOf(a);
     if (!latest[k] || a.row > latest[k].row) latest[k] = a;
