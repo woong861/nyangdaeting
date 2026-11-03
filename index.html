@@ -371,7 +371,7 @@ footer b{color:rgba(255,255,255,.85)}
         <div class="k"><h3>소개팅</h3><span class="tag">1:1</span></div>
         <p class="d">딱 맞는 한 사람과 연결해드려요</p>
         <div class="lines">
-          <div class="ln"><span>남학우 <em class="sale">할인</em></span><b><s class="was">17,000</s>15,000<small>원</small></b></div>
+          <div class="ln"><span>남학우 <em class="sale">할인</em></span><b><s class="was">20,000</s>16,000<small>원</small></b></div>
           <div class="ln"><span>여학우</span><span class="free">무료</span></div>
           <div class="ln"><span>🃏 카드 옵션</span><span style="font-size:13.5px;font-weight:700;color:var(--sub)">+2장 10,000원 · +5장 20,000원</span></div>
           <p class="d" style="margin-top:2px">여학우는 <b>보증금 5,000원</b> — 매칭 후 연락하거나 매칭이 안 되면 돌려드려요</p>
@@ -728,11 +728,11 @@ function val(name) {
   return (el.value || '').trim();
 }
 
-// 금액 안내 — 소개팅: 남 15,000(17,000에서 할인) / 여 3,000, 미팅(1인): 남 6,000 / 여 3,000
+// 금액 안내 — 소개팅: 남 16,000(20,000에서 할인) / 여 보증금 5,000, 미팅(1인): 남 6,000 / 여 3,000
 function priceOf(ev, g) {
   if (!ev || !g) return null;
   if (ev.startsWith('미팅')) return g === '여자' ? 3000 : 6000;
-  return g === '여자' ? 5000 : 15000;   // 여학우 소개팅은 참가비 무료 + 보증금 5,000원
+  return g === '여자' ? 5000 : 16000;   // 여학우 소개팅은 참가비 무료 + 보증금 5,000원
 }
 // 여학우 소개팅 = 보증금 (매칭 후 연락하거나 매칭 안 되면 돌려줌)
 const DEPOSIT_NOTE = '매칭 후 상대에게 연락하거나, 매칭이 안 되면 돌려드려요. 연락 무시·노쇼 시엔 돌려드리지 않아요.';
