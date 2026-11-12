@@ -371,7 +371,7 @@ footer b{color:rgba(255,255,255,.85)}
         <div class="k"><h3>소개팅</h3><span class="tag">1:1</span></div>
         <p class="d">딱 맞는 한 사람과 연결해드려요</p>
         <div class="lines">
-          <div class="ln"><span>남학우 <em class="sale">할인</em></span><b><s class="was">20,000</s>16,000<small>원</small></b></div>
+          <div class="ln"><span>남학우 <em class="sale">할인</em></span><b><s class="was">20,000</s>17,000<small>원</small></b></div>
           <div class="ln"><span>여학우</span><span class="free">무료</span></div>
           <div class="ln"><span>🃏 카드 옵션</span><span style="font-size:13.5px;font-weight:700;color:var(--sub)">+2장 10,000원 · +5장 20,000원</span></div>
           <p class="d" style="margin-top:2px">여학우는 <b>보증금 5,000원</b> — 매칭 후 연락하거나 매칭이 안 되면 돌려드려요</p>
@@ -401,7 +401,7 @@ footer b{color:rgba(255,255,255,.85)}
         <ol class="steps">
           <li class="rv"><strong>신청서 작성</strong><span>아래 신청서를 1분이면 채울 수 있어요.</span></li>
           <li class="rv"><strong>입금 + 오픈채팅으로 사진 제출</strong><span>잘 나온 본인 사진 1~2장을 보내주세요. 참가비가 있는 분은 신청 완료 화면에 나오는 계좌로 입금하고 캡처를 같이 보내주세요.</span></li>
-          <li class="rv"><strong>운영진이 직접 매칭</strong><span>MBTI·이상형·피하고 싶은 학과까지 보고 짝을 찾아요.</span></li>
+          <li class="rv"><strong>운영진이 직접 매칭</strong><span>MBTI·이상형·피하고 싶은 학과까지 보고 짝을 찾아요. 신청 후 <b>최대 2주</b> 안에 매칭해 드려요.</span></li>
           <li class="rv"><strong>문자로 결과 도착</strong><span>링크를 열면 상대 프로필과 카톡·인스타가 나와요. 먼저 인사해보세요 👋</span></li>
         </ol>
       </div>
@@ -597,7 +597,7 @@ footer b{color:rgba(255,255,255,.85)}
         </ul>
         <a class="btn btn-primary" href="https://open.kakao.com/o/sy7hqPQi" target="_blank" rel="noopener">📩 오픈채팅으로 사진 보내기</a>
         <p class="warnbox">신청서 제출 + 오픈채팅 사진 제출까지 해야 신청 완료예요!</p>
-        <p class="form-note">매칭되면 <span id="donePhone">적어주신 번호</span>로 결과 문자가 가요.</p>
+        <p class="form-note">매칭되면 <span id="donePhone">적어주신 번호</span>로 결과 문자가 가요. <b>최대 2주 정도 걸릴 수 있어요.</b></p>
       </div>
     </div>
   </div>
@@ -728,11 +728,11 @@ function val(name) {
   return (el.value || '').trim();
 }
 
-// 금액 안내 — 소개팅: 남 16,000(20,000에서 할인) / 여 보증금 5,000, 미팅(1인): 남 6,000 / 여 3,000
+// 금액 안내 — 소개팅: 남 17,000(20,000에서 할인) / 여 보증금 5,000, 미팅(1인): 남 6,000 / 여 3,000
 function priceOf(ev, g) {
   if (!ev || !g) return null;
   if (ev.startsWith('미팅')) return g === '여자' ? 3000 : 6000;
-  return g === '여자' ? 5000 : 16000;   // 여학우 소개팅은 참가비 무료 + 보증금 5,000원
+  return g === '여자' ? 5000 : 17000;   // 여학우 소개팅은 참가비 무료 + 보증금 5,000원
 }
 // 여학우 소개팅 = 보증금 (매칭 후 연락하거나 매칭 안 되면 돌려줌)
 const DEPOSIT_NOTE = '매칭 후 상대에게 연락하거나, 매칭이 안 되면 돌려드려요. 연락 무시·노쇼 시엔 돌려드리지 않아요.';
