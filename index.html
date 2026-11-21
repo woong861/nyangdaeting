@@ -552,6 +552,12 @@ footer b{color:rgba(255,255,255,.85)}
                 <p class="err">인스타 ID를 정확히 적어주세요 (영문·숫자·._)</p>
               </div>
             </div>
+            <div class="field" data-f="solo">
+              <label class="l" for="solo">💌 솔로 친구 추천 <span style="font-weight:600;color:var(--muted)">(선택)</span></label>
+              <input type="text" id="solo" name="solo" maxlength="31" autocapitalize="off" placeholder="친구 인스타 ID (예: nyang_friend)">
+              <p class="hint">친구분 중에 <b>정말 괜찮은데 솔로인 사람</b> 있으면 인스타 ID 하나만 적어주세요!<br>친구가 꼭 신청 안 해도 괜찮아요 🙌 운영진이 냥대팅 안내만 한 번 보내드려요.</p>
+              <p class="err">인스타 ID를 정확히 적어주세요 (영문·숫자·._)</p>
+            </div>
           </fieldset>
 
           <fieldset class="fs">
@@ -918,6 +924,7 @@ function validate() {
   if (val('phone') && !/^01[016789][0-9]{7,8}$/.test(phone)) bad('phone');
   if (friendCount() && friendsMissing()) bad('friends');
   if (val('instagram') && !isInsta(val('instagram'))) bad('instagram');
+  if ((($('#solo') || {}).value || '').trim() && !isInsta($('#solo').value.trim())) bad('solo');
   if (!$('#agree').checked || !$('#agree2').checked) bad('agree');
   if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
   return !first;
@@ -936,6 +943,7 @@ form.addEventListener('submit', async e => {
     if (k === 'payment' && sus.length) v = '⚠️검토필요(' + sus.join(',') + ') · ' + v;
     if (k === 'phone') v = v.replace(/[^0-9]/g, '');
     if (k === 'instagram') v = v.replace(/^@/, '');
+    if (k === 'friends') { const so = ($('#solo').value || '').trim().replace(/^@/, ''); if (so) v = (v ? v + ' · ' : '') + '[솔로 추천] 인스타 ' + so; }
     if (v) body.append(FIELD_IDS[k], v);
   });
   try {
