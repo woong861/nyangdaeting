@@ -233,6 +233,7 @@ textarea{resize:vertical;min-height:76px}
 @keyframes soloPulse{50%{box-shadow:0 0 0 6px rgba(255,107,154,.25)}}
 .field.bad .solo-in{border-color:#f3b5ba}
 .solo-add{margin-top:8px;border:1.5px dashed var(--pink-2);background:#fff;color:#e04a7c;font-weight:800;font-family:inherit;font-size:13.5px;border-radius:12px;padding:10px;width:100%}
+#soloList{margin-top:12px}
 #soloList .solo-in+.solo-in{margin-top:8px}
 .ref-in{margin-top:14px;padding-top:14px;border-top:1px dashed var(--pink-2)}
 .share-box{margin:18px 0 6px;background:linear-gradient(160deg,#fff4f8,#eef5fd);border:2px solid var(--pink-2);border-radius:18px;padding:16px;text-align:left}
@@ -597,15 +598,11 @@ footer b{color:rgba(255,255,255,.85)}
 
           <div class="field solo-box" data-f="solo" id="soloBox">
             <span class="solo-chip">💌 마지막 한 칸 · 편하게 적어주세요</span>
-            <h3 class="solo-t">같이 할 <em>괜찮은 솔로 친구</em> 있어요?</h3>
-            <p class="solo-d">정말 괜찮은데 솔로인 친구 있으면 인스타 ID 편하게 적어주세요!<br><b>친구가 꼭 신청 안 해도 괜찮아요</b> 🙌<br>나중에 친구가 신청하면 <b>두 분 모두 카드 1장 보너스</b>도 있어요.</p>
-            <div class="solo-perks">
-              <div><b>🃏 둘 다 카드 +1</b><span>친구 1명 신청할 때마다<br>나도 +1 (최대 +3장)</span></div>
-              <div><b>🤝 내가 보증하는 친구</b><span>친구 신청서에 추천인으로<br>내 아이디가 남아요</span></div>
-            </div>
+            <h3 class="solo-t">주변에 <em>괜찮은 솔로 친구</em> 있어요?</h3>
+            <p class="solo-d">정말 괜찮은 친구 있으면 인스타 적어주세요!<br>친구가 신청하면 <b>두 분 모두 카드 1장 보너스</b>로 드려요.</p>
             <div id="soloList"><div class="solo-in"><span>@</span><input type="text" id="solo" class="solo-ig" name="solo" maxlength="31" autocapitalize="off" autocomplete="off" placeholder="데려올 친구 인스타 ID"></div></div>
             <button type="button" class="solo-add" id="soloAdd">+ 친구 더 적기 (최대 3명)</button>
-            <p class="solo-s">📩 제출하면 친구에게 보낼 <b>추천 링크</b>도 복사할 수 있어요 · 보너스 카드는 친구가 그 링크로 신청했을 때 들어가요</p>
+            <p class="solo-s">📩 제출 후 친구에게 보낼 <b>추천 링크</b>를 드려요</p>
             <p class="solo-nudge" id="soloNudge" hidden>👆 떠오르는 솔로 친구 있으면 <b>아이디만 편하게</b> 적어주세요! 없으면 제출 버튼을 한 번 더 눌러주세요</p>
             <p class="err">인스타 ID를 정확히 적어주세요 (영문·숫자·._)</p>
             <div class="ref-in" data-f="ref">
