@@ -232,6 +232,8 @@ textarea{resize:vertical;min-height:76px}
 .solo-box.nudge{animation:soloPulse .9s ease-in-out 2}
 @keyframes soloPulse{50%{box-shadow:0 0 0 6px rgba(255,107,154,.25)}}
 .field.bad .solo-in{border-color:#f3b5ba}
+.solo-add{margin-top:8px;border:1.5px dashed var(--pink-2);background:#fff;color:#e04a7c;font-weight:800;font-family:inherit;font-size:13.5px;border-radius:12px;padding:10px;width:100%}
+#soloList .solo-in+.solo-in{margin-top:8px}
 .ref-in{margin-top:14px;padding-top:14px;border-top:1px dashed var(--pink-2)}
 .share-box{margin:18px 0 6px;background:linear-gradient(160deg,#fff4f8,#eef5fd);border:2px solid var(--pink-2);border-radius:18px;padding:16px;text-align:left}
 .share-box b.t{display:block;font-size:16px;margin-bottom:6px}
@@ -594,21 +596,22 @@ footer b{color:rgba(255,255,255,.85)}
           </fieldset>
 
           <div class="field solo-box" data-f="solo" id="soloBox">
-            <span class="solo-chip">🎁 친구 데려오면 둘 다 카드 +1</span>
+            <span class="solo-chip">🎁 친구 1명 데려올 때마다 둘 다 카드 +1</span>
             <h3 class="solo-t">같이 할 <em>괜찮은 솔로 친구</em> 있어요?</h3>
             <p class="solo-d">정말 괜찮은데 솔로인 친구 인스타 ID를 적고, 친구에게 냥대팅을 추천해 주세요.<br>친구가 신청하면 <b>두 분 모두 카드 1장 보너스!</b></p>
             <div class="solo-perks">
-              <div><b>🃏 둘 다 카드 +1</b><span>친구가 신청하면<br>나도 친구도 한 명 더 보고 골라요</span></div>
+              <div><b>🃏 둘 다 카드 +1</b><span>친구 1명 신청할 때마다<br>나도 +1 (최대 +3장)</span></div>
               <div><b>🤝 내가 보증하는 친구</b><span>친구 신청서에 추천인으로<br>내 아이디가 남아요</span></div>
             </div>
-            <div class="solo-in"><span>@</span><input type="text" id="solo" name="solo" maxlength="31" autocapitalize="off" autocomplete="off" placeholder="데려올 친구 인스타 ID"></div>
-            <p class="solo-s">📩 제출하면 친구에게 보낼 <b>추천 메시지</b>를 바로 복사할 수 있어요 · 친구가 지금 신청 안 해도 내 신청은 그대로 접수돼요</p>
+            <div id="soloList"><div class="solo-in"><span>@</span><input type="text" id="solo" class="solo-ig" name="solo" maxlength="31" autocapitalize="off" autocomplete="off" placeholder="데려올 친구 인스타 ID"></div></div>
+            <button type="button" class="solo-add" id="soloAdd">+ 친구 더 적기 (최대 3명)</button>
+            <p class="solo-s">📩 제출하면 친구에게 보낼 <b>추천 링크</b>를 바로 복사할 수 있어요. 친구가 그 링크로 신청하면 보너스가 들어가요 · 친구가 지금 신청 안 해도 내 신청은 그대로 접수돼요</p>
             <p class="solo-nudge" id="soloNudge" hidden>👆 친구 한 명 적고 데려오면 <b>둘 다 카드 +1</b>! 없으면 제출 버튼을 한 번 더 눌러주세요</p>
             <p class="err">인스타 ID를 정확히 적어주세요 (영문·숫자·._)</p>
             <div class="ref-in" data-f="ref">
               <label class="l" for="ref">혹시 친구 추천으로 오셨나요? <span style="font-weight:600;color:var(--muted)">(선택)</span></label>
               <div class="solo-in"><span>@</span><input type="text" id="ref" name="ref" maxlength="31" autocapitalize="off" autocomplete="off" placeholder="추천해준 친구 인스타 ID"></div>
-              <p class="solo-s">적어주시면 추천해준 친구와 <b>두 분 모두 카드 +1</b></p>
+              <p class="solo-s">추천인을 적어야 <b>두 분 모두 카드 +1</b>이 들어가요</p>
             </div>
           </div>
 
@@ -640,7 +643,7 @@ footer b{color:rgba(255,255,255,.85)}
         <p class="warnbox">신청서 제출 + 오픈채팅 사진 제출까지 해야 신청 완료예요!</p>
         <div class="share-box" id="shareBox" hidden>
           <b class="t">🤝 이제 친구를 데려와 주세요!</b>
-          <span style="font-size:13px;color:var(--sub,#4b5b73)">아래 메시지를 친구에게 보내면, 친구가 신청할 때 추천인이 자동으로 들어가요. 친구가 신청하면 <b>두 분 모두 카드 +1</b></span>
+          <span style="font-size:13px;color:var(--sub,#4b5b73)">아래 메시지를 친구에게 보내주세요. 이 링크로 신청하면 추천인이 자동으로 들어가서 <b>친구 1명당 두 분 모두 카드 +1</b> (최대 +3장)</span>
           <pre id="shareMsg"></pre>
           <button type="button" id="shareBtn">📋 추천 메시지 복사하기</button>
         </div>
@@ -817,6 +820,15 @@ function updatePay() {
 }
 $('#refund').addEventListener('input', e => { delete e.target.dataset.auto; });
 
+// 솔로 친구 추천 칸 추가 (최대 3명)
+$('#soloAdd').addEventListener('click', () => {
+  const list = $('#soloList'), n = list.querySelectorAll('.solo-ig').length;
+  if (n >= 3) return;
+  const w = document.createElement('div'); w.className = 'solo-in';
+  w.innerHTML = '<span>@</span><input type="text" class="solo-ig" maxlength="31" autocapitalize="off" autocomplete="off" placeholder="친구 ' + (n + 1) + ' 인스타 ID">';
+  list.appendChild(w); w.querySelector('input').focus();
+  if (n + 1 >= 3) $('#soloAdd').hidden = true;
+});
 // ?ref=인스타 로 들어오면 추천인 칸 자동 입력
 try { const r0 = (new URLSearchParams(location.search).get('ref') || '').replace(/[^A-Za-z0-9._]/g, '').slice(0, 30); if (r0) $('#ref').value = r0; } catch (e) { }
 function copyText(t, msg) {
@@ -967,7 +979,7 @@ function validate() {
   if (val('phone') && !/^01[016789][0-9]{7,8}$/.test(phone)) bad('phone');
   if (friendCount() && friendsMissing()) bad('friends');
   if (val('instagram') && !isInsta(val('instagram'))) bad('instagram');
-  if ((($('#solo') || {}).value || '').trim() && !isInsta($('#solo').value.trim())) bad('solo');
+  document.querySelectorAll('.solo-ig').forEach(i => { if (i.value.trim() && !isInsta(i.value.trim())) bad('solo'); });
   if ((($('#ref') || {}).value || '').trim() && !isInsta($('#ref').value.trim())) bad('solo');
   if (!$('#agree').checked || !$('#agree2').checked) bad('agree');
   if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -978,7 +990,7 @@ function validate() {
 form.addEventListener('submit', async e => {
   e.preventDefault();
   if (!validate()) return;
-  if (!$('#solo').value.trim() && !window.__soloNudged) {
+  if (![...document.querySelectorAll('.solo-ig')].some(i => i.value.trim()) && !window.__soloNudged) {
     window.__soloNudged = true;
     const sb = $('#soloBox'); $('#soloNudge').hidden = false;
     sb.classList.remove('nudge'); void sb.offsetWidth; sb.classList.add('nudge');
@@ -994,7 +1006,7 @@ form.addEventListener('submit', async e => {
     if (k === 'payment' && sus.length) v = '⚠️검토필요(' + sus.join(',') + ') · ' + v;
     if (k === 'phone') v = v.replace(/[^0-9]/g, '');
     if (k === 'instagram') v = v.replace(/^@/, '');
-    if (k === 'friends') { const so = ($('#solo').value || '').trim().replace(/^@/, ''); if (so) v = (v ? v + ' · ' : '') + '[솔로 추천] 인스타 ' + so; const rf = ($('#ref').value || '').trim().replace(/^@/, ''); if (rf) v = (v ? v + ' · ' : '') + '[추천인] 인스타 ' + rf; }
+    if (k === 'friends') { const so = [...document.querySelectorAll('.solo-ig')].map(i => i.value.trim().replace(/^@/, '')).filter(Boolean).join(', '); if (so) v = (v ? v + ' · ' : '') + '[솔로 추천] 인스타 ' + so; const rf = ($('#ref').value || '').trim().replace(/^@/, ''); if (rf) v = (v ? v + ' · ' : '') + '[추천인] 인스타 ' + rf; }
     if (v) body.append(FIELD_IDS[k], v);
   });
   try {
@@ -1061,7 +1073,7 @@ function showDone(g, ev, phone, suspicious) {
   try {
     const me = (val('instagram') || '').replace(/^@/, '');
     const link = 'https://hannyang.site/?ref=' + encodeURIComponent(me);
-    const msg = '나 냥대팅 신청했는데 너 생각나서 추천해놨어 😆\n운영진이 이상형 보고 직접 1:1로 이어주는 연합 소개팅이야!\n이 링크로 신청하면 추천인에 내 아이디가 자동으로 들어가서 우리 둘 다 카드 1장 더 받아 🃏\n' + link;
+    const msg = '너 괜찮은데 솔로인 거 아까워서 추천함ㅋㅋ\n나 냥대팅 신청했는데 이 링크로 하면 우리 둘 다 카드 1장씩 더 준대\n' + link;
     $('#shareMsg').textContent = msg;
     $('#shareBtn').onclick = () => { if (navigator.share) navigator.share({ text: msg }).catch(() => copyText(msg, '추천 메시지를 복사했어요')); else copyText(msg, '추천 메시지를 복사했어요'); };
     $('#shareBox').hidden = !me;
