@@ -238,6 +238,10 @@ textarea{resize:vertical;min-height:76px}
 .ref-in{margin-top:14px;padding-top:14px;border-top:1px dashed var(--pink-2)}
 .share-box{margin:18px 0 6px;background:linear-gradient(160deg,#fff4f8,#eef5fd);border:2px solid var(--pink-2);border-radius:18px;padding:16px;text-align:left}
 .share-box b.t{display:block;font-size:16px;margin-bottom:6px}
+.my-code{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:10px 12px;margin-top:10px}
+.my-code span{white-space:nowrap;font-size:12.5px;color:var(--muted,#7a879b);font-weight:700}
+.my-code b{flex:1;font-size:20px;font-weight:900;letter-spacing:.12em;color:#e04a7c}
+.share-box .my-code button{width:auto;flex:none;font-size:13px;border:0;border-radius:9px;padding:7px 12px;font-weight:800;font-family:inherit;background:var(--sky);color:var(--blue)}
 .share-box pre{white-space:pre-wrap;font-family:inherit;font-size:13px;color:var(--sub,#4b5b73);background:#fff;border-radius:12px;padding:12px;margin:8px 0;line-height:1.55}
 .share-box button{width:100%;border:0;border-radius:12px;padding:13px;font-weight:800;font-family:inherit;font-size:15px;color:#fff;background:var(--pink)}
 /* friends */
@@ -606,9 +610,9 @@ footer b{color:rgba(255,255,255,.85)}
             <p class="solo-nudge" id="soloNudge" hidden>👆 떠오르는 솔로 친구 있으면 <b>아이디만 편하게</b> 적어주세요! 없으면 제출 버튼을 한 번 더 눌러주세요</p>
             <p class="err">인스타 ID를 정확히 적어주세요 (영문·숫자·._)</p>
             <div class="ref-in" data-f="ref">
-              <label class="l" for="ref">혹시 친구 추천으로 오셨나요? <span style="font-weight:600;color:var(--muted)">(선택)</span></label>
-              <div class="solo-in"><span>@</span><input type="text" id="ref" name="ref" maxlength="31" autocapitalize="off" autocomplete="off" placeholder="추천해준 친구 인스타 ID"></div>
-              <p class="solo-s">추천인을 적어야 <b>두 분 모두 카드 +1</b>이 들어가요</p>
+              <label class="l" for="ref">추천 코드가 있나요? <span style="font-weight:600;color:var(--muted)">(선택)</span></label>
+              <div class="solo-in"><span>#</span><input type="text" id="ref" name="ref" maxlength="31" autocapitalize="characters" autocomplete="off" placeholder="추천 코드 6자리 (예: K7Q2XM)"></div>
+              <p class="solo-s">추천 코드를 넣으면 추천해준 친구와 <b>두 분 모두 카드 +1</b></p>
             </div>
           </div>
 
@@ -640,7 +644,8 @@ footer b{color:rgba(255,255,255,.85)}
         <p class="warnbox">신청서 제출 + 오픈채팅 사진 제출까지 해야 신청 완료예요!</p>
         <div class="share-box" id="shareBox" hidden>
           <b class="t">🤝 이제 친구를 데려와 주세요!</b>
-          <span style="font-size:13px;color:var(--sub,#4b5b73)">아래 메시지를 친구에게 보내주세요. 이 링크로 신청하면 추천인이 자동으로 들어가서 <b>친구 1명당 두 분 모두 카드 +1</b> (최대 +2장)</span>
+          <span style="font-size:13px;color:var(--sub,#4b5b73)">친구가 이 링크로 신청하거나 <b>추천 코드</b>를 넣으면 <b>친구 1명당 두 분 모두 카드 +1</b> (최대 +2장). 에타·단톡방엔 코드만 올려도 돼요 — 인스타 아이디는 안 보여요</span>
+          <div class="my-code"><span>내 추천 코드</span><b id="myCode"></b><button type="button" id="codeBtn">복사</button></div>
           <pre id="shareMsg"></pre>
           <button type="button" id="shareBtn">📋 추천 메시지 복사하기</button>
         </div>
@@ -826,8 +831,9 @@ $('#soloAdd').addEventListener('click', () => {
   list.appendChild(w); w.querySelector('input').focus();
   if (n + 1 >= 2) $('#soloAdd').hidden = true;
 });
-// ?ref=인스타 로 들어오면 추천인 칸 자동 입력
-try { const r0 = (new URLSearchParams(location.search).get('ref') || '').replace(/[^A-Za-z0-9._]/g, '').slice(0, 30); if (r0) $('#ref').value = r0; } catch (e) { }
+function refCode(ig) { ig = String(ig || '').trim().replace(/^@/, '').toLowerCase(); if (!ig) return ''; let h = 0x811c9dc5; for (let i = 0; i < ig.length; i++) { h ^= ig.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(36).toUpperCase().padStart(6, '0').slice(-6); }
+// ?ref=추천코드 로 들어오면 추천 코드 칸 자동 입력
+try { const r0 = (new URLSearchParams(location.search).get('ref') || '').replace(/[^A-Za-z0-9._]/g, '').slice(0, 30); if (r0) $('#ref').value = /^[A-Za-z0-9]{6}$/.test(r0) ? r0.toUpperCase() : r0; } catch (e) { }
 function copyText(t, msg) {
   (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast(msg)).catch(() => toast(t));
 }
@@ -977,7 +983,7 @@ function validate() {
   if (friendCount() && friendsMissing()) bad('friends');
   if (val('instagram') && !isInsta(val('instagram'))) bad('instagram');
   document.querySelectorAll('.solo-ig').forEach(i => { if (i.value.trim() && !isInsta(i.value.trim())) bad('solo'); });
-  if ((($('#ref') || {}).value || '').trim() && !isInsta($('#ref').value.trim())) bad('solo');
+  if ((($('#ref') || {}).value || '').trim() && !isInsta($('#ref').value.trim().replace(/^#/, ''))) bad('solo');
   if (!$('#agree').checked || !$('#agree2').checked) bad('agree');
   if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
   return !first;
@@ -1003,7 +1009,7 @@ form.addEventListener('submit', async e => {
     if (k === 'payment' && sus.length) v = '⚠️검토필요(' + sus.join(',') + ') · ' + v;
     if (k === 'phone') v = v.replace(/[^0-9]/g, '');
     if (k === 'instagram') v = v.replace(/^@/, '');
-    if (k === 'friends') { const so = [...document.querySelectorAll('.solo-ig')].map(i => i.value.trim().replace(/^@/, '')).filter(Boolean).join(', '); if (so) v = (v ? v + ' · ' : '') + '[솔로 추천] 인스타 ' + so; const rf = ($('#ref').value || '').trim().replace(/^@/, ''); if (rf) v = (v ? v + ' · ' : '') + '[추천인] 인스타 ' + rf; }
+    if (k === 'friends') { const so = [...document.querySelectorAll('.solo-ig')].map(i => i.value.trim().replace(/^@/, '')).filter(Boolean).join(', '); if (so) v = (v ? v + ' · ' : '') + '[솔로 추천] 인스타 ' + so; const rf = ($('#ref').value || '').trim().replace(/^[@#]/, ''); if (rf) v = (v ? v + ' · ' : '') + (/^[A-Za-z0-9]{6}$/.test(rf) ? '[추천인] 코드 ' + rf.toUpperCase() : '[추천인] 인스타 ' + rf); }
     if (v) body.append(FIELD_IDS[k], v);
   });
   try {
@@ -1069,7 +1075,9 @@ function showDone(g, ev, phone, suspicious) {
   $('#donePhone').textContent = phone;
   try {
     const me = (val('instagram') || '').replace(/^@/, '');
-    const link = 'https://hannyang.site/?ref=' + encodeURIComponent(me);
+    const code = refCode(me); $('#myCode').textContent = code;
+    $('#codeBtn').onclick = () => copyText(code, '추천 코드를 복사했어요');
+    const link = 'https://hannyang.site/?ref=' + code;
     const msg = '너 괜찮은데 솔로인 거 아까워서 추천함ㅋㅋ\n나 냥대팅 신청했는데 이 링크로 하면 우리 둘 다 카드 1장씩 더 준대\n' + link;
     $('#shareMsg').textContent = msg;
     $('#shareBtn').onclick = () => { if (navigator.share) navigator.share({ text: msg }).catch(() => copyText(msg, '추천 메시지를 복사했어요')); else copyText(msg, '추천 메시지를 복사했어요'); };

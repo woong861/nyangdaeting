@@ -333,17 +333,22 @@ function pairEval(m, f) {
 }
 let SUGG = [];
 // ============ 카드 매칭 ============
+function refCode(ig) { ig = String(ig || '').trim().replace(/^@/, '').toLowerCase(); if (!ig) return ''; let h = 0x811c9dc5; for (let i = 0; i < ig.length; i++) { h ^= ig.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(36).toUpperCase().padStart(6, '0').slice(-6); }
 // 친구 추천 보너스: 친구 신청서의 [추천인]이 실제 신청자일 때만 → 친구 +1, 추천한 사람은 친구 1명당 +1 (최대 +2)
 let _refCache = null, _refLen = -1;
 function refBonusMap() {
   if (_refCache && _refLen === APPLICANTS.length) return _refCache;
   const ig = v => String(v || '').trim().replace(/^@/, '').toLowerCase();
-  const byIg = new Map(); APPLICANTS.forEach(a => { const k = ig(a.instagram); if (k) byIg.set(k, a); });
+  const byIg = new Map(), byCode = new Map(); APPLICANTS.forEach(a => { const k = ig(a.instagram); if (k) { byIg.set(k, a); byCode.set(refCode(k), a); } });
   const map = new Map(), add = (row, n) => map.set(row, Math.min(2, (map.get(row) || 0) + n));
   const seen = new Set();
   APPLICANTS.forEach(b => {
-    const m = String(b.friends || '').match(/\[추천인\] 인스타 ([A-Za-z0-9._]+)/); if (!m) return;
-    const r = m[1].toLowerCase(), me = ig(b.instagram), a = byIg.get(r);
+    const mc = String(b.friends || '').match(/\[추천인\] 코드 ([A-Z0-9]{6})/), mi = String(b.friends || '').match(/\[추천인\] 인스타 ([A-Za-z0-9._]+)/);
+    if (!mc && !mi) return;
+    const me = ig(b.instagram);
+    let a = mc ? byCode.get(mc[1]) || byIg.get(mc[1].toLowerCase()) : byIg.get(mi[1].toLowerCase());
+    if (!a) return;
+    const r = ig(a.instagram);
     if (!a || r === me || a.row === b.row) return;
     const key = r + '>' + (me || b.row); if (seen.has(key)) return; seen.add(key);   // 같은 친구 중복 신청은 1번만
     add(b.row, 1); add(a.row, 1);
