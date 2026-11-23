@@ -333,7 +333,7 @@ function pairEval(m, f) {
 }
 let SUGG = [];
 // ============ 카드 매칭 ============
-function cardOf(a) { const m = String(a.payment || '').match(/\[카드\+(\d)\]/); return m ? Number(m[1]) : 0; }
+function cardOf(a) { const m = String(a.payment || '').match(/\[카드\+(\d)\]/); return (m ? Number(m[1]) : 0) + (/\[솔로 추천\]/.test(a.friends || '') ? 1 : 0); }   // 솔로 친구 추천 보너스 카드 +1
 let picker = null, cands = [];
 function needCount() { return picker ? (cardOf(picker) || 2) + 1 : 0; }
 function setPicker(row) {

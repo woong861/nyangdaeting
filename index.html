@@ -214,6 +214,24 @@ textarea{resize:vertical;min-height:76px}
 .submit:disabled{opacity:.6}
 .form-note{text-align:center;font-size:13px;color:var(--muted);margin-top:12px}
 
+/* 솔로 친구 추천 */
+.solo-box{box-sizing:border-box;width:100%;min-width:0;background:linear-gradient(160deg,#fff4f8,#eef5fd);border:2px solid var(--pink-2);border-radius:20px;padding:20px 18px 16px;margin:6px 0 18px}
+.solo-chip{display:inline-block;font-size:12px;font-weight:800;color:#e04a7c;background:#fff;border-radius:99px;padding:5px 11px}
+.solo-t{font-size:19px;font-weight:850;letter-spacing:-.03em;margin:10px 0 6px;color:var(--ink,#0f1b2d)}
+.solo-t em{font-style:normal;color:#e04a7c}
+.solo-d{font-size:13.5px;color:var(--sub,#4b5b73);line-height:1.6}
+.solo-perks{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin:12px 0}
+.solo-perks div{background:#fff;border-radius:14px;padding:11px 12px}
+.solo-perks b{display:block;font-size:14px;font-weight:800;color:var(--blue)}
+.solo-perks span{display:block;font-size:12px;color:var(--sub,#4b5b73);margin-top:3px;line-height:1.45}
+.solo-in{display:flex;align-items:center;background:#fff;border:1.5px solid var(--line,#e4eaf2);border-radius:14px;padding-left:14px}
+.solo-in span{font-weight:800;color:var(--muted,#7a879b)}
+.solo-in input{border:0!important;box-shadow:none!important;background:transparent!important;flex:1;min-width:0}
+.solo-s{font-size:11.5px;color:var(--muted,#7a879b);margin-top:8px}
+.solo-nudge{font-size:13px;color:#e04a7c;margin-top:8px;font-weight:600}
+.solo-box.nudge{animation:soloPulse .9s ease-in-out 2}
+@keyframes soloPulse{50%{box-shadow:0 0 0 6px rgba(255,107,154,.25)}}
+.field.bad .solo-in{border-color:#f3b5ba}
 /* friends */
 .friends{margin-top:4px}
 .fr{border:1.5px dashed var(--sky-2);border-radius:18px;padding:16px 14px 4px;margin-bottom:12px;background:#fbfdff}
@@ -551,12 +569,6 @@ footer b{color:rgba(255,255,255,.85)}
                 <p class="err">인스타 ID를 정확히 적어주세요 (영문·숫자·._)</p>
               </div>
             </div>
-            <div class="field" data-f="solo">
-              <label class="l" for="solo">💌 솔로 친구 추천 <span style="font-weight:600;color:var(--muted)">(선택)</span></label>
-              <input type="text" id="solo" name="solo" maxlength="31" autocapitalize="off" placeholder="친구 인스타 ID (예: nyang_friend)">
-              <p class="hint">친구분 중에 <b>정말 괜찮은데 솔로인 사람</b> 있으면 인스타 ID 하나만 적어주세요!<br>친구가 꼭 신청 안 해도 괜찮아요 🙌<br>🎁 추천해 주시면 <b>우선 매칭</b>, 친구가 신청하면 <b>두 분 모두 카드 1장 추가!</b></p>
-              <p class="err">인스타 ID를 정확히 적어주세요 (영문·숫자·._)</p>
-            </div>
           </fieldset>
 
           <fieldset class="fs">
@@ -575,6 +587,20 @@ footer b{color:rgba(255,255,255,.85)}
               <p class="err">환불 계좌를 적어주세요</p>
             </div>
           </fieldset>
+
+          <div class="field solo-box" data-f="solo" id="soloBox">
+            <span class="solo-chip">🎁 마지막 한 칸 · 적기만 해도 카드 +1</span>
+            <h3 class="solo-t">주변에 <em>아까운 솔로 친구</em> 있어요?</h3>
+            <p class="solo-d">정말 괜찮은데 솔로인 친구, 인스타 ID 하나만 알려주세요.<br><b>친구가 신청 안 해도 보너스는 그대로 드려요!</b></p>
+            <div class="solo-perks">
+              <div><b>🃏 카드 1장 보너스</b><span>적기만 해도<br>한 명 더 보고 골라요</span></div>
+              <div><b>⚡ 우선 매칭</b><span>내 매칭 순서 UP<br>친구가 신청하면 친구도 +1</span></div>
+            </div>
+            <div class="solo-in"><span>@</span><input type="text" id="solo" name="solo" maxlength="31" autocapitalize="off" autocomplete="off" placeholder="친구 인스타 ID"></div>
+            <p class="solo-s">🔒 누가 추천했는지는 친구에게 말하지 않아요 · 운영진이 안내 DM만 한 번 보내요</p>
+            <p class="solo-nudge" id="soloNudge" hidden>👆 친구 한 명만 적어도 <b>카드 1장 보너스 + 우선 매칭</b>! 없으면 제출 버튼을 한 번 더 눌러주세요</p>
+            <p class="err">인스타 ID를 정확히 적어주세요 (영문·숫자·._)</p>
+          </div>
 
           <div class="field" data-f="agree">
             <label class="agree"><input type="checkbox" id="agree"><span>매칭을 위해 위 정보(연락처·카톡·인스타 포함)를 운영진이 확인하고, <b>매칭된 상대에게 카톡·인스타 ID·학교·나이·MBTI·자기소개가 전달</b>되는 데 동의해요.</span></label>
@@ -933,6 +959,13 @@ function validate() {
 form.addEventListener('submit', async e => {
   e.preventDefault();
   if (!validate()) return;
+  if (!$('#solo').value.trim() && !window.__soloNudged) {
+    window.__soloNudged = true;
+    const sb = $('#soloBox'); $('#soloNudge').hidden = false;
+    sb.classList.remove('nudge'); void sb.offsetWidth; sb.classList.add('nudge');
+    sb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
   const btn = $('#submitBtn');
   btn.disabled = true; btn.textContent = '제출 중...';
   const sus = suspicionReasons();
