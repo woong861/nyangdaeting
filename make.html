@@ -218,7 +218,7 @@ async function loadApplicants() {
       onRetry: (n, t) => { list.innerHTML = '<div class="empty">⏳ 재시도 ' + n + '/' + t + '</div>'; }
     });
     if (d.error) throw new Error(d.error);
-    APPLICANTS = d.applicants || [];
+    APPLICANTS = d.applicants || []; _refLen = -1;
     document.getElementById('loadedCount').textContent = APPLICANTS.length + '명';
     document.getElementById('lastRefresh').textContent = '갱신 ' + new Date().toLocaleTimeString('ko-KR');
     // 슬롯 최신화
@@ -264,7 +264,7 @@ function renderList() {
       (a.friends ? '<div class="sub" style="color:#1b64b5">👯 ' + esc(a.friends.replace(/^\[미팅 친구\]\s*/, '')) + '</div>' : '') +
       (a.intro ? '<div class="intro">"' + esc(a.intro) + '"</div>' : '') +
       (a.ideal ? '<div class="sub">💘 ' + esc(a.ideal) + '</div>' : '') +
-      (cardOf(a) ? '<div class="sub" style="color:#b45309;font-weight:800">🃏 카드 +' + cardOf(a) + '장 (' + (cardOf(a) + 1) + '명 중 선택)</div>' : '') +
+      (cardOf(a) ? '<div class="sub" style="color:#b45309;font-weight:800">🃏 카드 +' + cardOf(a) + '장 (' + (cardOf(a) + 1) + '명 중 선택)' + (refBonusSet().has(a.row) ? ' · 🤝 친구추천 보너스 포함' : '') + '</div>' : '') +
       '</div><div class="btns"><button class="btn b-sec" onclick="setSlot(\'a\',' + a.row + ')">A로</button><button class="btn b-sec" onclick="setSlot(\'b\',' + a.row + ')">B로</button>' +
       '<button class="btn b-sec" style="font-size:11.5px" onclick="setPicker(' + a.row + ')">🃏 고르는 사람</button><button class="btn b-sec" style="font-size:11.5px" onclick="addCand(' + a.row + ')">＋후보</button></div></div>';
   }).join('');
@@ -333,7 +333,21 @@ function pairEval(m, f) {
 }
 let SUGG = [];
 // ============ 카드 매칭 ============
-function cardOf(a) { const m = String(a.payment || '').match(/\[카드\+(\d)\]/); return (m ? Number(m[1]) : 0) + (/\[솔로 추천\]/.test(a.friends || '') ? 1 : 0); }   // 솔로 친구 추천 보너스 카드 +1
+// 친구 추천 보너스: 추천한 친구가 실제로 신청했을 때만 두 사람 모두 카드 +1
+let _refCache = null, _refLen = -1;
+function refBonusSet() {
+  if (_refCache && _refLen === APPLICANTS.length) return _refCache;
+  const ig = v => String(v || '').trim().replace(/^@/, '').toLowerCase();
+  const tag = (a, k) => { const m = String(a.friends || '').match(new RegExp('\\[' + k + '\\] 인스타 ([A-Za-z0-9._]+)')); return m ? m[1].toLowerCase() : ''; };
+  const byIg = new Map(); APPLICANTS.forEach(a => { const k = ig(a.instagram); if (k) byIg.set(k, a); });
+  const set = new Set();
+  APPLICANTS.forEach(a => {
+    const me = ig(a.instagram);
+    [tag(a, '솔로 추천'), tag(a, '추천인')].forEach(f => { if (f && f !== me && byIg.has(f)) { set.add(a.row); set.add(byIg.get(f).row); } });
+  });
+  _refCache = set; _refLen = APPLICANTS.length; return set;
+}
+function cardOf(a) { const m = String(a.payment || '').match(/\[카드\+(\d)\]/); return (m ? Number(m[1]) : 0) + (refBonusSet().has(a.row) ? 1 : 0); }
 let picker = null, cands = [];
 function needCount() { return picker ? (cardOf(picker) || 2) + 1 : 0; }
 function setPicker(row) {
