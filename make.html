@@ -333,13 +333,13 @@ function pairEval(m, f) {
 }
 let SUGG = [];
 // ============ 카드 매칭 ============
-// 친구 추천 보너스: 친구 신청서의 [추천인]이 실제 신청자일 때만 → 친구 +1, 추천한 사람은 친구 1명당 +1 (최대 +3)
+// 친구 추천 보너스: 친구 신청서의 [추천인]이 실제 신청자일 때만 → 친구 +1, 추천한 사람은 친구 1명당 +1 (최대 +2)
 let _refCache = null, _refLen = -1;
 function refBonusMap() {
   if (_refCache && _refLen === APPLICANTS.length) return _refCache;
   const ig = v => String(v || '').trim().replace(/^@/, '').toLowerCase();
   const byIg = new Map(); APPLICANTS.forEach(a => { const k = ig(a.instagram); if (k) byIg.set(k, a); });
-  const map = new Map(), add = (row, n) => map.set(row, Math.min(3, (map.get(row) || 0) + n));
+  const map = new Map(), add = (row, n) => map.set(row, Math.min(2, (map.get(row) || 0) + n));
   const seen = new Set();
   APPLICANTS.forEach(b => {
     const m = String(b.friends || '').match(/\[추천인\] 인스타 ([A-Za-z0-9._]+)/); if (!m) return;
